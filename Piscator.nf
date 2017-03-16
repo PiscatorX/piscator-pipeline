@@ -56,29 +56,30 @@ output:
 }
 
 
-// process Data_splitter{
-// //Process does nothing but create other channels
 
-// input:
-//     set fwd, rev  from file_data.splitCsv()
-//                                 .flatten()
-//                                 .collate(2)
+process Data_splitter{
+//This process does nothing but create other channels
+
+input:
+    set fwd, rev  from file_data.splitCsv()
+                                .flatten()
+                                .collate(2)
                               
                        
-// output:
-//    set fwd, rev into primers_analyze,
-//                      primers_raw,
-//    		     primers_tsv,
-//    		     primers_physchem
+output:
+   set fwd, rev into primers_analyze,
+                     primers_raw,
+   		     primers_tsv,
+   		     primers_physchem
    
    
 
-// """
+"""
 
-//    :
+   :
 
-// """
-// }
+"""
+}
 
 
 
