@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 params.primers_csv = "primer_select.csv"
-params.primerDB_path = "$PWD/PiscatorDB.db"
+params.primerDB_path = "$PWD/Piscator_results/PiscatorDB.db"
 params.blast_RefSeq  = "$PWD/M32703.fasta"
 params.ref_fasta  = "Ref_SeqX.fasta"
 params.ref_fasta  = "temp.fasta"
@@ -15,25 +15,25 @@ taxonomy_mapping = file(params.taxonomy_mapping)
 taxa_coverage_dir = "$output/taxa_coverage"
 cd_hit_clusters = Channel.from(0.80, 0.90, 0.95, 0.97, 1.00)
 
-// process Init_PrimerDB{
+
+process Init_PrimerDB{
+
+input:
+    file primers_csv
+    val primerDB  
 
 
-// input:
-//     file primers_csv
-//     val primerDB  
-
-
-// output:
-//    val primerDB into primers
+output:
+   val primerDB into primers
 
  
-// """
+"""
 
-//     Init_PrimerDB.py --primers-file $primers_csv --db-name $primerDB
+    Init_PrimerDB.py --primers-file $primers_csv --db-name $primerDB
 
-// """ 
+""" 
 
-// }
+}
 
 
 // process gen_tsv_primers{
@@ -380,24 +380,24 @@ cd_hit_clusters = Channel.from(0.80, 0.90, 0.95, 0.97, 1.00)
 
 
 
-process physchem_plots{
+// process physchem_plots{
 
-publishDir path: output, mode: 'copy'
+// publishDir path: output, mode: 'copy'
 
-input:
+// input:
 
-  each 'physchem?.sql' 
+//   each 'physchem?.sql' 
 
-output:
-  //file '*.pdf' into plots
-  stdout verbose
+// output:
+//   //file '*.pdf' into plots
+//   stdout verbose
 
-"""
+// """
 
-   echo 
+//    echo 
 
-"""
-}
+// """
+// }
 
 
-verbose.subscribe{print it}
+// verbose.subscribe{print it}
