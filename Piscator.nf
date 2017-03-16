@@ -26,7 +26,7 @@ input:
 output:
    val primerDB into primers
 
- 
+   
 """
 
     Init_PrimerDB.py --primers-file $primers_csv --db-name $primerDB
@@ -36,24 +36,24 @@ output:
 }
 
 
-// process gen_tsv_primers{
+process gen_tsv_primers{
 
-//   publishDir path: output, mode: 'copy'
+  publishDir path: output, mode: 'copy'
 
-// input:
-//    val primerDB from primers 
+input:
+   val primerDB from primers 
 
 
-// output:
-//     stdout file_data 
-//     file '*.tsv' into  primer_files
+output:
+    stdout file_data 
+    file '*.tsv' into  primer_files
  
-// """
-//    gen_tsv_primersx.py  --out $output --db $primerDB 
+"""
+   gen_tsv_primersx.py  --out $output --db $primerDB 
    
-// """
+"""
 
-// }
+}
 
 
 // process Data_splitter{
