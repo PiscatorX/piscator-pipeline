@@ -1,35 +1,42 @@
 #!/usr/bin/env nextflow
+
+output = "Piscator_results"
 params.primers_csv = "primer_select.csv"
-params.primerDB_path = "$PWD/Piscator_results/PiscatorDB.db"
-params.blast_RefSeq  = "$PWD/M32703.fasta"
-params.ref_fasta  = "Ref_SeqX.fasta"
-params.ref_fasta  = "temp.fasta"
-params.taxonomy_mapping = ("taxonomy_mapping.txt")
-output = "$PWD/Piscator_results"
-primerDB = Channel.value(params.primerDB_path)
-blast_RefSeq = Channel.value(params.blast_RefSeq)
-ref_fasta = file(params.ref_fasta)
+params.db_name = "Piscator.db"
+params.primerDB = "$baseDir/$output/$params.db_name"
 primers_csv = file(params.primers_csv)
-get_amplicon_sql = file("get_amplicon.sql")
-taxonomy_mapping = file(params.taxonomy_mapping)
-taxa_coverage_dir = "$output/taxa_coverage"
-cd_hit_clusters = Channel.from(0.80, 0.90, 0.95, 0.97, 1.00)
+
+// primerDB_path = "$PWD/$primerDB/$params.primerDB"
+// params.blast_RefSeq = "$PWD/M32703.fasta"
+// params.ref_fasta = "Ref_SeqX.fasta"
+// params.ref_fasta = "temp.fasta"
+// params.taxonomy_mapping = ("taxonomy_mapping.txt")
+// blast_RefSeq = Channel.value(params.blast_RefSeq)
+// ref_fasta = file(params.ref_fasta)
+// get_amplicon_sql = file("get_amplicon.sql")
+// taxonomy_mapping = file(params.taxonomy_mapping)
+// taxa_coverage_dir = "$output/taxa_coverage"
+// cd_hit_clusters = Channel.from(0.80, 0.90, 0.95, 0.97, 1.00)
+
 
 
 process Init_PrimerDB{
 
-input:
-    file primers_csv
-    val primerDB  
 
+publishDir path: output, mode: 'copy'
+
+input:
+       file primers_csv
+       val  params.db_name  
 
 output:
-   val primerDB into primers
+       file '*.db' into primers
 
-   
+
 """
 
-    Init_PrimerDB.py --primers-file $primers_csv --db-name $primerDB
+    Init_PrimerDB.py --primers-file $primers_csv --db-name $params.db_name
+     
 
 """ 
 
@@ -38,18 +45,19 @@ output:
 
 process gen_tsv_primers{
 
-  publishDir path: output, mode: 'copy'
+publishDir path: output, mode: 'copy'
 
 input:
    val primerDB from primers 
 
-
 output:
-    stdout file_data 
+
+    stdout fwd_rev_pair 
     file '*.tsv' into  primer_files
- 
+
+    
 """
-   gen_tsv_primersx.py  --out $output --db $primerDB 
+     gen_tsv_primers.py  --out $output --db $primerDB 
    
 """
 
@@ -60,8 +68,9 @@ output:
 process Data_splitter{
 //This process does nothing but create other channels
 
+  
 input:
-    set fwd, rev  from file_data.splitCsv()
+    set fwd, rev  from fwd_rev_pair.splitCsv()
                                 .flatten()
                                 .collate(2)
                               
@@ -72,32 +81,41 @@ output:
    		     primers_tsv,
    		     primers_physchem
    
-   
+"""
+
+  :
 
 """
 
-   :
-
-"""
 }
 
 
 
-// process get_PhysChem{
+process get_PhysChem {
+
+echo true
 
 
-// input:
-//     val primer from primers_physchem.flatten()
-//     val  primerDB
+input:
+    val primer from primer_files
 
 
-// """
-
-//    get_PhysChem.py -p $primer -d  $primerDB
-
-// """
+output:
+    val primer into primer_physchem  
     
-// }
+
+"""
+
+   echo $primer
+
+"""
+    
+}
+
+//get_PhysChem.py -p $primer -d  $params.primerDB
+//physchem_plots =  primer_physchem.collectFile()
+//physchem_plots.subscribe{ print it}
+
 
 // process  BlastPrimers{
 
@@ -393,12 +411,14 @@ output:
 //   //file '*.pdf' into plots
 //   stdout verbose
 
+  
 // """
 
-//    echo 
+//    echo $PWD 
 
 // """
 // }
+
 
 
 // verbose.subscribe{print it}
