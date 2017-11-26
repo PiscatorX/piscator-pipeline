@@ -28,5 +28,8 @@ def mk_fasta(line):
     seq_out = lambda x:SeqRecord(Seq(x[1], IUPAC.ambiguous_dna), id=x[0], description='')    
     return seq_out(line.split('\t'))
 
-args = get_args()
-write_fasta(args.primer_input,args.seq_format)
+
+
+if __name__ ==  '__main__':
+    args = get_args()
+    write_fasta(args.primer_input,args.seq_format)

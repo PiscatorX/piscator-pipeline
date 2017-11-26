@@ -1,45 +1,58 @@
-#!/usr/bin/python
-
-from generate_primers import PiscatorDB_Primers
+#!/usr/bin/env python
+from init_primerDB import PrimerDB
+import mysql.connector
+import argparse
 import sys
 import os
 
-class PrimerProspector(PiscatorDB_Primers):
-      
-    def Primer_pair_amplicons(self, ext = '.tsv'):
-         
-        """
-           Generate a tsv of primer for primer_prospector            
 
-        """
+class generateTSV(PrimerDB):
+
+    def __init__(self):
         
-        primer_pairs = self.get_primer_tsv()
+        super(generateTSV, self).__init__()
+
+        self.cnx.database = self.DB_NAME  
+
+        
+
+    def get_pairs(self, ext = '.tsv'):
+        
+        sql = """SELECT Fwd_id, Forward_Primer, Rev_id,
+                 Rev_Primer from primers;"""
+        
+        self.cursor.execute(sql)
+        
+        self. primer_pairs  =   ( (fwd_id, fwd, rev_id, rev) for fwd_id, fwd, rev_id, rev\
+                in self.cursor.fetchall())
+
+
+    def generateTSV(self, ext = '.tsv'):
+    
         fix_id = lambda primer_id, Dir: primer_id if primer_id.endswith(Dir) else primer_id+Dir
         save   = lambda primer_id, primer: open(primer_id + ext,'w').write(primer)
-        output_dir = self.output_dir
-        out = lambda primer_id: os.path.join(output_dir, primer_id + ext)
-        self.output = []
-        self.pair_data = []
-        for fwd_id, fwd, rev_id, rev in primer_pairs:
+        out = lambda primer_id: primer_id + ext
+        
+        output = []
+        #pair_data = []
+        
+        for fwd_id, fwd, rev_id, rev in self.primer_pairs:
             fwd_id, rev_id  = map(lambda x:\
-                                  x.replace('_','.'),  (fix_id(fwd_id.lower(),'f'), fix_id(rev_id.lower(),'r')))
+                              x.replace('_','.'),  (fix_id(fwd_id.lower(),'f'), fix_id(rev_id.lower(),'r')))
             fwd =  '\t'.join([fwd_id,fwd])
             rev =   '\t'.join([rev_id,rev])
-            save(fwd_id, fwd)
-            save(rev_id, rev)
+            for primer_id, direct in [(fwd_id, fwd), (rev_id, rev)]:
+                save(primer_id, direct)
             to_nextflow = map(out, [fwd_id, rev_id])
-            self.pair_data.append([fwd_id, rev_id])
-            self.output.append(','.join(to_nextflow)+'\n')
-
-    def send2stdout(self):
-        
-        """
-            simple utility to send to print out to nextflow
-
-        """
-        sys.stdout.writelines(self.output)
+            #pair_data.append([fwd_id, rev_id])
+            output.append(','.join(to_nextflow)+'\n')
+        sys.stdout.writelines(output)
     
+
 if __name__ == '__main__':
-    PP = PrimerProspector()
-    PP.Primer_pair_amplicons() 
-    PP.send2stdout()
+    get_tsv = generateTSV()
+    get_tsv.get_pairs()
+    get_tsv.generateTSV()
+
+
+    

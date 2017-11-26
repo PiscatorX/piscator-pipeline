@@ -18,20 +18,21 @@ class Pairing_block(object):
     def blocker(self):
         
         t1 = datetime.now()
-        time.sleep(3)
+        time.sleep(1)
         while len(self.args.file_pair) != 0:
             for mate_file in self.args.file_pair:
+                #print mate_file
                 if os.path.exists(mate_file):
-                    t2 = datetime.now()
-                    delta = t2 - t1
-                    if delta.seconds > 1800:
-                        raise Exception,"Pairing of hits took too long"
-                    self.args.file_pair.remove(mate_file)
-                    f_name = os.path.basename(mate_file)
-                    f_name = os.path.join(os.getcwd(), f_name)
-                    print mate_file
-                    print f_name
-                    os.symlink(mate_file, f_name)
+                     t2 = datetime.now()
+                     delta = t2 - t1
+                     if delta.seconds > 1800:
+                         raise Exception,"Pairing of hits took too long"
+                     self.args.file_pair.remove(mate_file)
+                     f_name = os.path.basename(mate_file)
+                     f_name = os.path.join(os.getcwd(), f_name)
+                     #print mate_file
+                     #print f_name
+                     os.symlink(mate_file, f_name)
 
                     
 block = Pairing_block()
