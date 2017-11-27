@@ -18,7 +18,7 @@ class generateTSV(PrimerDB):
 
     def get_pairs(self, ext = '.tsv'):
         
-        sql = """SELECT Fwd_id, Forward_Primer, Rev_id,
+        sql = """SELECT Fwd_id, Fwd_Primer, Rev_id,
                  Rev_Primer from primers;"""
         
         self.cursor.execute(sql)

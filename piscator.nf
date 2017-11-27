@@ -1,23 +1,20 @@
 #!/usr/bin/env nextflow
 
 output = "$PWD/Piscator_out"
-//params.primers_csv = "primer_select.csv"
-params.primers_csv = "OptimusPrimerDB.csv"
-params.db_name = "Piscator.db"
-primerDB = "$output/$params.db_name"
-primers_csv = file(params.primers_csv)
+params.primers_csv = "primers.csv"
 params.blast_RefSeq = "$PWD/M32703.fasta"
+params.taxonomy_mapping = ("taxonomy_mapping.txt")
+params.cd_hit_threads  =  2
+params.clustalo_threads = 2
+
+primers_csv = file(params.primers_csv)
 //params.ref_fasta = "SILVA_DB.fasta"
 params.ref_fasta = "temp2.fasta"
-params.taxonomy_mapping = ("taxonomy_mapping.txt")
 // blast_RefSeq = Channel.value(params.blast_RefSeq)
 ref_fasta = file(params.ref_fasta)
 taxonomy_mapping = file(params.taxonomy_mapping)
 taxa_coverage_dir = "$output/taxa_coverage"
-cd_hit_clusters = Channel.from(0.97, 1.00)
-//cd_hit_clusters = Channel.from(0.80, 0.90, 0.97, 1.00)
-cd_hit_threads  =  2
-clustalo_threads = 2
+cd_hit_clusters = Channel.from(0.80, 0.90, 0.97, 1.00)
 hits_ext = '_'+params.ref_fasta.replace('.fasta','')+'_hits.txt'
 
 
@@ -152,13 +149,17 @@ output:
 save_data = physchem_data.collectFile()
 
 
+
 process physchem_plots{
+
 
 publishDir path: output, mode: 'copy'
 
 input:
    val complete from save_data
 
+output:
+   file '*.pdf' into propplots
    
 """
 
@@ -286,7 +287,7 @@ script:
 
 
 """
-    cdhit-est -i $amplicons  -c $cluster_perc -T $cd_hit_threads -d 0 -r 0 -p 1 -g 1  -o \
+    cdhit-est -i $amplicons  -c $cluster_perc -T $params.cd_hit_threads -d 0 -r 0 -p 1 -g 1  -o \
     ${cdhit_clusters}_${cluster_perc}.cd_hits 
     
 """
@@ -345,7 +346,7 @@ output:
    
 """ 
 
-    get_distances.py
+    get_distances.py -t  $params.clustalo_threads
      
 """
 

@@ -37,11 +37,11 @@ class LoadDB(PrimerDB):
         
         insert_dict = {}
         for row in self.csv_reader:
-            row_dict = dict(zip(csv_headers,row))
+            row_dict = dict(zip(csv_headers, map(lambda w: w.strip(), row)))
             if self.headers:
                 for k in row_dict:
                     if k in self.table_cols:
-                        insert_dict[k] = row_dict[k].strip()
+                        insert_dict[k] = row_dict[k]
                     else:
                         print "column {} removed from data not inserted into DB (use -h/--help for help)".format(k)
                 if  insert_dict:
@@ -54,19 +54,8 @@ class LoadDB(PrimerDB):
         
         cols = ','.join(row_dict.keys()) 
         values = ','.join( '"'+val.translate(None,""""'""")+'"'  for val in  row_dict.values())
-        sql = """INSERT INTO primers ({})
-               VALUES ({})""".format(cols, values)
+        sql = """INSERT INTO primers ({}) VALUES ({})""".format(cols, values)
         
-        print sql
-        #Inserts rows into the primers table one row at time
-        #slow for large datasets, sqlite3 .import csv function is faster.
-        #TO DO implement sqlite csv import
-        # sql = """INSERT INTO primers (gene,Fwd_id,Forward_Primer,
-        #          Rev_id,Rev_Primer,Amplicon_length, technology,
-        #          Reference,Cross_ref, notes)
-        #       VALUES ('{gene}','{Fwd_id}','{Forward_Primer}',
-        #          '{Rev_id}','{Rev_Primer}','{Amplicon_length}','{technology}',
-        #          '{Reference}','{Cross_ref}','{notes}');""".format(**row_dict)
         try:
             self.cursor.execute(sql)
         except mysql.connector.errors.IntegrityError as err:
