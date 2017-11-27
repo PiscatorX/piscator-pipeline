@@ -49,7 +49,7 @@ class PrimerDB(object):
              " CREATE TABLE `primers` ("
              " `gene` CHAR(255) NOT NULL,"
              " `Fwd_id`  CHAR(30) NOT NULL,"
-             " `Forward_Primer` CHAR(255) NOT NULL,"
+             " `Fwd_Primer` CHAR(255) NOT NULL,"
              " `Rev_id` CHAR(30) NOT NULL,"
              " `Rev_Primer` CHAR(255) NOT NULL,"
              " `Amplicon_length` CHAR(255),"
