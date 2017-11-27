@@ -13,6 +13,21 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 4.  Mysql
 
 
+###**Nextflow**###
+
+Nextflow requires Java to to run, for more details follow the details provided here
+1. You will need to run the commands below to get it
+* ``sudo apt-get update``
+* ``sudo apt-get install default``
+2. Now you can download next flow using the following command
+````
+This will generate ``nextflow`` file which you will have to move to your PATH. A safe place would be the /opt directory for example
+``mv nextflow  /opt``
+*Once you have moved the file you can test the installation by running ``nextflow`` in the terminal it should return a help message.  
+
+
+
+
 
 ### Docker images, source files
 
@@ -20,10 +35,23 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 
 
 
-### Primerprospector
+### **Primerprospector**
+
+1 .Firt you must install python dependensies.  Install  pythop-pip a utility for downloading python modules
+``sudo apt-get install pip``
+
+
+1 .Numpy
+
+1. First you must install PyCogent
+
 
 1. **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
-   *Build-essential ``sudo apt-get install build-essential`` 
+   *Build-essential ``sudo apt-get install build-essential``
+2.  Download primerprospector frow this link. Alternatively run the following command
+    ``wget  ``
+   *This downloads *tar.gz file
+   *
    *Python 2.6 (src) (license: PSF)
    *PyCogent 1.5 (src) (license: GPL) 
    *Numpy 1.3.0 (src) (license: BSD)
@@ -51,7 +79,9 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 * Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
 
 
+###**EMBOSS utilities**
 
+1. EMBOSS package ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-6.5.7.tar.gz 
 
 
 ### Installing
