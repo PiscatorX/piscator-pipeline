@@ -8,8 +8,7 @@ params.cd_hit_threads  =  2
 params.clustalo_threads = 2
 
 primers_csv = file(params.primers_csv)
-//params.ref_fasta = "SILVA_DB.fasta"
-params.ref_fasta = "temp2.fasta"
+params.ref_fasta = "SILVA_DB.fasta"
 // blast_RefSeq = Channel.value(params.blast_RefSeq)
 ref_fasta = file(params.ref_fasta)
 taxonomy_mapping = file(params.taxonomy_mapping)
@@ -63,15 +62,15 @@ output:
 
 process Get_pairs{
   
-publishDir path: output, mode: 'copy'
   
 input:
    val return_msge from compiled_DB 
 
 output:
     stdout fwd_rev_pair 
-    file '*.tsv' into  primer_files
- 
+    file '*.tsv' into  primer_files,
+                       primers_physchem,
+		       primers_analyze
     
 """
      gen_tsv_primers.py 
@@ -93,11 +92,9 @@ input:
                                    .map{ it }
                                    .collate(2)
 output:
-   set fwd, rev into primers_analyze,
-                     primers_raw,
+   set fwd, rev into primers_raw,
    		     primers_tsv,
    		     primers_files,
-		     primers_physchem,
 		     primer_data
 		     
 """
@@ -111,7 +108,6 @@ output:
 
 process Generate_fasta{
 
-publishDir path: output, mode: 'copy'
 
 input:
    val primer_tsv from primer_files.flatten()
@@ -130,7 +126,6 @@ output:
 
 
 
-
 process Get_PhysProp {
 
 input:
@@ -140,13 +135,14 @@ output:
     val primer into physchem_data
     
 """
-   get_physprop.py -p $output/$primer
+   get_physprop.py -p $primer
 
 """
 }
 
 
 save_data = physchem_data.collectFile()
+                              .toList()
 
 
 
@@ -156,7 +152,7 @@ process physchem_plots{
 publishDir path: output, mode: 'copy'
 
 input:
-   val complete from save_data
+   val sucess from save_data
 
 output:
    file '*.pdf' into propplots
@@ -169,7 +165,7 @@ output:
 
 }
 
-
+ 
 process Get_Pairs{
   
 input:
@@ -386,7 +382,7 @@ output:
      
 """
 
-   analyze_primers.py -f  $ref_fasta -P $output/$primer
+   analyze_primers.py -f  $ref_fasta -P $primer
 
 """
 
@@ -424,7 +420,7 @@ script:
 
 process Get_amplicons_and_reads{
 
-publishDir path: output, mode: 'copy'
+  //publishDir path: output, mode: 'copy'
 
 input:
      set fwd_hit, rev_hit from primer_hits1
@@ -501,6 +497,7 @@ publishDir path: taxa_coverage_dir, mode: 'copy'
 input:
     set fwd_hit,  rev_hit from primer_hits2
     file taxonomy_mapping
+
     
 
 """
