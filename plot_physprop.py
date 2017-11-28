@@ -63,9 +63,11 @@ class PhyspropPlot(PrimerDB):
         for p in ax.patches:    
             ax.annotate("%.1f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
                         ha='center', va='center', xytext=(0, 10), color='blue', size=12, textcoords='offset points')
-            ax.set(ylabel=prop, xlabel="Primer ID")
+            
         plt.xticks(fontsize=16, rotation=45, ha="right")
-
+        plt.xlabel('Primer ID', fontsize=18, fontweight='bold')
+        plt.ylabel(prop, fontsize=18, fontweight='bold')
+        
         plt.tight_layout()
         figure = ax.get_figure()
         figure.savefig(fname)
