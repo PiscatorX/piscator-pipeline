@@ -47,15 +47,15 @@ class GetDistances():
         
         aln_fname =  file_in.replace('cd_hits','aln')
         dist_fname = file_in.replace('cd_hits','dist')
-        args = "clustalo --in {0} --out {1} --force --distmat-out {2}\
-        --full --threads {3}".format(file_in, aln_fname, dist_fname, self.threads)     
+        # args = "clustalo --in {0} --out {1} --force --distmat-out {2}\
+        # --full --threads {3}".format(file_in, aln_fname, dist_fname, self.threads)     
         
-        proc = subprocess.Popen(args,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        stdout, stderr = proc.communicate()
+        # proc = subprocess.Popen(args,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        # stdout, stderr = proc.communicate()
         
-        if  stderr:
-            #print stderr
-            return
+        # if  stderr:
+        #     print stderr
+        #     return
         self.dist_list.append(dist_fname.replace('dist','dat'))
         self.parse_dist(dist_fname)
 
@@ -69,15 +69,19 @@ class GetDistances():
         
         try:
             with open(dist_fname) as dist_file:
-                #print 'Parse',dist_fname
+                print 'Parse',dist_fname
                 n = int(dist_file.next())    
                 data_matrix = np.zeros((n,n))
                 for i, row in enumerate(dist_file, 0):
                     data_matrix[i] = split_row(row)[1:]
-                    
-                self.distance_arrays[dist_fname] = data_matrix[np.triu_indices(n)]
+                dist_matrix = data_matrix[np.triu_indices(n)]
+                n_array = len(dist_matrix)
+                if (n_array > 100000):
+                    dist_matrix = np.random.choice(dist_matrix, 100000,  replace=True)
+                    print "***n_array**",n_array,dist_fname
+                self.distance_arrays[dist_fname] = dist_matrix
         except IOError as err:
-            #print err
+            print err
             return
 
         
@@ -86,7 +90,7 @@ class GetDistances():
         
         self.f_list = self.distance_arrays.keys()
         
-        #print 'Compile data',self.f_list
+        print 'Compile data',self.f_list
         
         cluster_ids = [cluster_fname.split('r_')[-1].replace('.dist','') for cluster_fname in self.f_list ]
         self.cluster_fnames = {}
@@ -102,6 +106,7 @@ class GetDistances():
                 continue
             cluster_data = {}
             for f_name in self.f_list:
+                
                 cluster_data[os.path.basename(f_name.rsplit('_', 1)[0])] = self.distance_arrays[f_name]
             self.Init_plot(cluster_data, plt_fname) 
         
@@ -120,8 +125,8 @@ class GetDistances():
         dist_data = [ cluster_data[k] for k in labels ]
         locations = dict((i,j) for j,i in enumerate(labels,1))    
 
-        # for x in cluster_data.values():
-        #     print x.shape
+        for x in cluster_data.values():
+            print x.shape
         merged_data  = np.concatenate(dist_data)
         y_max, y_min = map(lambda func: func(merged_data), [np.amax, np.amin])
         y_max = y_max + 0.075 * top
@@ -208,7 +213,8 @@ class GetDistances():
         plt.savefig("{}".format(plt_fname), bbox_inches='tight')
         plt.close()
 
-    
+        
+        
     def get_stars(self, p):
 
         if p < 0.0001:
