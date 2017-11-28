@@ -45,34 +45,31 @@ class PhyspropPlot(PrimerDB):
                 data[primer_id] = pd.Series(prop_data, index = index)
             df_list.append(pd.DataFrame(data))
         df_cat = pd.concat(df_list)
-        
-        #print df_cat
         df_x = df_cat.T
-        plot_dat = {'physchem_GC.pdf': ['Length', 'GC'],
-                    'physchem_Tm.pdf': [ 'Tm', 'TmProd'],
-                    'physchem_Deltas.pdf': ['DeltaS', 'DeltaG', 'DeltaH']}
 
-        for fname, prop_list in plot_dat.items():
-            self.draw(df_x , fname, prop_list)
+        prop_list = self.col_ids[1:]
+        for prop in prop_list:
+            f_name = ''.join(['physchem_',prop, '.pdf'])
+            self.draw(df_x , prop, f_name)
+            
 
+    def draw(self, df, prop, fname):
 
-    def draw(self, df, fname, prop_list):
-
-        fig, axes = plt.subplots(nrows=len(prop_list), ncols=1)
+        fig, ax = plt.subplots(1,1)
         fig.subplots_adjust(hspace=.5)
-
         sns.set_style('whitegrid')
+        
+        ax = sns.barplot(data=df[prop].T, ax=ax, palette=sns.color_palette('pastel'), capsize=.1)
+        for p in ax.patches:    
+            ax.annotate("%.1f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
+                        ha='center', va='center', xytext=(0, 10), color='blue', size=12, textcoords='offset points')
+            ax.set(ylabel=prop, xlabel="Primer ID")
+        plt.xticks(fontsize=16, rotation=45, ha="right")
 
-        for i, prop in enumerate(prop_list, 0):
-            ax = sns.barplot(data=df[prop].T, ax=axes[i], palette=sns.color_palette('pastel'), capsize=.1)
-            for p in ax.patches:    
-                ax.annotate("%.1f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-                            ha='center', va='center', xytext=(0, 10), textcoords='offset points')
-                ax.set(ylabel=prop, xlabel="Primer ID")
-
+        plt.tight_layout()
         figure = ax.get_figure()
         figure.savefig(fname)
-        #plt.show()
+        
         
 if __name__ == '__main__':
     pltx = PhyspropPlot()

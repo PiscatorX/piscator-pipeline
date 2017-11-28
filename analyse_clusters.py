@@ -61,12 +61,12 @@ class ClusterAnalysis(object):
         width = (1 - space)/(len(conditions))
         patterns = it.cycle(["+", "x" ".", "*" , "/" , "\\" , "|" , "-"  , "o", "O"])
         for i,cond in enumerate(conditions):
-            indeces = range(1, len(categories)+1)        
+            indices = range(1, len(categories)+1)        
             vals = dpoints[dpoints[:,0] == cond][:,2].astype(np.float)
             pos = [j - (1 - space) / 2. + i * width for j in range(1,len(categories)+1) ]    
-            ax.bar(pos, vals, width=width, label=cond, color=cm.Accent(float(i) / n), hatch=patterns.next())
+            ax.bar(pos, vals, width=width, label=cond, color=cm.Accent(float(i) / n - i/n), hatch=patterns.next())
 
-        ax.set_xticks(indeces)
+        ax.set_xticks(indices)
         ax.set_xticklabels(categories)
         plt.setp(plt.xticks()[1], rotation=0)
         plt.rc('legend',**{'fontsize':8})
