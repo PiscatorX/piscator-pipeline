@@ -43,15 +43,15 @@ class GetDistances():
         
         aln_fname =  file_in.replace('cd_hits','aln')
         dist_fname = file_in.replace('cd_hits','dist')
-        # args = "clustalo --in {0} --out {1} --force --distmat-out {2}\
-        # --full --threads {3}".format(file_in, aln_fname, dist_fname, self.threads)     
+        args = "clustalo --in {0} --out {1} --force --distmat-out {2}\
+        --full --threads {3}".format(file_in, aln_fname, dist_fname, self.threads)     
         
-        # proc = subprocess.Popen(args,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        # stdout, stderr = proc.communicate()
+        proc = subprocess.Popen(args,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        stdout, stderr = proc.communicate()
         
-        # if  stderr:
-        #     print stderr
-        #     return
+        if  stderr:
+            print stderr
+            return
         self.dist_list.append(dist_fname.replace('dist','dat'))
         self.parse_dist(dist_fname)
         
