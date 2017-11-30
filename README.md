@@ -48,10 +48,7 @@ This will generate ``nextflow`` file which you will have to move to your PATH. A
 
 1. **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
    *Build-essential ``sudo apt-get install build-essential``
-2.  Download primerprospector frow this link. Alternatively run the following command
-    ``wget  ``
-   *This downloads *tar.gz file
-   *
+2.  Dependencies
    *Python 2.6 (src) (license: PSF)
    *PyCogent 1.5 (src) (license: GPL) 
    *Numpy 1.3.0 (src) (license: BSD)
