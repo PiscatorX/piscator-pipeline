@@ -1,4 +1,4 @@
-e# Piscator
+# Piscator 
 
 A [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotided used in the Polymerase Chain Reaction (PCR) for amplicon-based metagenomics.
 
@@ -13,7 +13,7 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 4.  Mysql
 
 
-###**Nextflow**###
+###**Nextflow**
 
 Nextflow requires Java to to run, for more details follow the details provided here
 1. You will need to run the commands below to get it
@@ -35,7 +35,7 @@ This will generate ``nextflow`` file which you will have to move to your PATH. A
 
 
 
-### **Primerprospector**###
+### **Primerprospector**
 
 1 .Firt you must install python dependensies.  Install  pythop-pip a utility for downloading python modules
 ``sudo apt-get install pip``
