@@ -20,9 +20,9 @@ Nextflow requires Java to to run, for more details follow the details provided h
 * ``sudo apt-get update``
 * ``sudo apt-get install default``
 2. Now you can download next flow using the following command
-*``wget -qO- get.nextflow.io | bash``
+* ``wget -qO- get.nextflow.io | bash``
 This will generate a ``nextflow`` file which you will have to move to your PATH.
-*Once you have moved the file you can test the installation by running ``nextflow`` in the terminal it should return a help message.  
+* Once you have moved the file you can test the installation by running ``nextflow`` in the terminal it should return a help message.  
 
 
 
@@ -38,13 +38,12 @@ This will generate a ``nextflow`` file which you will have to move to your PATH.
 
 
 1.**[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
-  *Build-essential ``sudo apt-get install build-essential``
+  * Build-essential ``sudo apt-get install build-essential``
 2. Dependencies
- *Python 2.6 (src) (license: PSF)
- *PyCogent 1.5 (src) (license: GPL) 
- *Numpy 1.3.0 (src) (license: BSD)
- *Matplotlib 0.98.5.3 (src) (license: BSD)
-   
+ * Python 2.6 (src) (license: PSF)
+ * PyCogent 1.5 (src) (license: GPL) 
+ * Numpy 1.3.0 (src) (license: BSD)
+ * Matplotlib 0.98.5.3 (src) (license: BSD)
 3. **Primerprospector installation**
 * ``svn co https://pprospector.svn.sourceforge.net/svnroot/pprospector/trunk pprospector``
 *  ``cd /home/pprospector``
@@ -61,7 +60,7 @@ This will generate a ``nextflow`` file which you will have to move to your PATH.
 
 4. **Python dependencies**
 
-*PyCogent (ver. 1.5)  http://sourceforge.net/projects/pycogent/files/PyCogent/1.5/PyCogent-1.5.tgz/download (license: GPL)
-*Numpy (ver. 1.3.0)   http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0.tar.gz/download (license: BSD)
-*Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
+  * PyCogent (ver. 1.5)  http://sourceforge.net/projects/pycogent/files/PyCogent/1.5/PyCogent-1.5.tgz/download (license: GPL)
+  * Numpy (ver. 1.3.0)   http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0.tar.gz/download (license: BSD)
+  * Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
 
