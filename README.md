@@ -20,8 +20,8 @@ Nextflow requires Java to to run, for more details follow the details provided h
 * ``sudo apt-get update``
 * ``sudo apt-get install default``
 2. Now you can download next flow using the following command
-````
-This will generate ``nextflow`` file which you will have to move to your PATH.
+*``wget -qO- get.nextflow.io | bash``
+This will generate a ``nextflow`` file which you will have to move to your PATH.
 *Once you have moved the file you can test the installation by running ``nextflow`` in the terminal it should return a help message.  
 
 
