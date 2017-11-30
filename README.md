@@ -1,6 +1,6 @@
 # Piscator 
 
-A [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotided used in the Polymerase Chain Reaction (PCR) for amplicon-based metagenomics.
+Piscator is a  [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotided used in the Polymerase Chain Reaction (PCR) for amplicon-based metagenomics.
 
 ## Getting Started
 
