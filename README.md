@@ -1,4 +1,4 @@
-# Piscator
+e# Piscator
 
 A [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotided used in the Polymerase Chain Reaction (PCR) for amplicon-based metagenomics.
 
@@ -29,21 +29,21 @@ This will generate ``nextflow`` file which you will have to move to your PATH. A
 
 
 
-### Docker images, source files
+<!-- ### Docker images, source files ### -->
 
-1. https://store.docker.com/community/images/nextflow/nextflow
+<!-- 1. https://store.docker.com/community/images/nextflow/nextflow -->
 
 
 
-### **Primerprospector**
+### **Primerprospector**###
 
 1 .Firt you must install python dependensies.  Install  pythop-pip a utility for downloading python modules
 ``sudo apt-get install pip``
 
 
-1 .Numpy
+<!-- 1 .Numpy -->
 
-1. First you must install PyCogent
+<!-- 1. First you must install PyCogent -->
 
 
 1. **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
@@ -58,7 +58,7 @@ This will generate ``nextflow`` file which you will have to move to your PATH. A
    *Matplotlib 0.98.5.3 (src) (license: BSD)
    * The ``taxa_assignment_report.py`` script requires   
    
-2. **Primerprospector installation**
+3. **Primerprospector installation**
 * ``svn co https://pprospector.svn.sourceforge.net/svnroot/pprospector/trunk pprospector``
 *  ``cd /home/pprospector``
 *  ``tar -xvzf pprospector-1.0.1.tar.gz``
@@ -67,24 +67,24 @@ This will generate ``nextflow`` file which you will have to move to your PATH. A
 *  ``source /home/prospector/.bashrc``
 *  ``cd /home/pprospector/tests/``
 
-3.  **[RDP classifier](https://sourceforge.net/projects/rdp-classifier/) installation**
+4.  **[RDP classifier](https://sourceforge.net/projects/rdp-classifier/) installation**
 * RDP classifier source files ``https://downloads.sourceforge.net/project/rdp-classifier/rdp-classifier/rdp_classifier_2.12.zip``
 * ``echo "export PYTHONPATH=/home/pprospector/RDP/:$PYTHONPATH" >> /home/pprospector/.bashrc``
 * ``source /home/pprospector/.bashrc``
 
 4. **Python dependencies**
 
-* PyCogent (ver. 1.5)  http://sourceforge.net/projects/pycogent/files/PyCogent/1.5/PyCogent-1.5.tgz/download (license: GPL)
-* Numpy (ver. 1.3.0)   http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0.tar.gz/download (license: BSD)
-* Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
+*PyCogent (ver. 1.5)  http://sourceforge.net/projects/pycogent/files/PyCogent/1.5/PyCogent-1.5.tgz/download (license: GPL)
+*Numpy (ver. 1.3.0)   http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0.tar.gz/download (license: BSD)
+*Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
 
 
-###**EMBOSS utilities**
+<!-- ###**EMBOSS utilities** -->
 
-1. EMBOSS package ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-6.5.7.tar.gz 
+<!-- 1. EMBOSS package ftp://emboss.open-bio.org/pub/EMBOSS/EMBOSS-6.5.7.tar.gz  -->
 
 
-### Installing
+<!-- ### Installing -->
 
 
 
