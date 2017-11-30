@@ -1,8 +1,8 @@
 # Piscator 
 
-Piscator is a  [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotided used in the Polymerase Chain Reaction (PCR) for amplicon-based metagenomics.
+Piscator is a [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotided used in the Polymerase Chain Reaction (PCR) for amplicon-based metagenomics.
 
-## Getting Started
+## **Getting Started**
 
 Piscator is basically several utilities from the [primerprospector](http://pprospector.sourceforge.net) pipeline program, [EMBOSS](http://http://emboss.sourceforge.net/) utilities and several custom python scripts for connecting to a mysql data, analysing and plotting results. To get started clone/download this repository to your local machine and install the prerequisites in the list below. 
 
