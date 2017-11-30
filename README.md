@@ -10,7 +10,7 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 1.  Nextflow 
 2.  primerprospector
 3.  EMBOSS utilities
-4.  Mysql
+4.  MySQL
 
 
 ### Nextflow
@@ -37,14 +37,13 @@ This will generate a ``nextflow`` file which you will have to move to your PATH.
 
 
 
-1. **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
-   *Build-essential ``sudo apt-get install build-essential``
-2.  Dependencies
-   *Python 2.6 (src) (license: PSF)
-   *PyCogent 1.5 (src) (license: GPL) 
-   *Numpy 1.3.0 (src) (license: BSD)
-   *Matplotlib 0.98.5.3 (src) (license: BSD)
-   * The ``taxa_assignment_report.py`` script requires   
+1.**[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
+  *Build-essential ``sudo apt-get install build-essential``
+2. Dependencies
+ *Python 2.6 (src) (license: PSF)
+ *PyCogent 1.5 (src) (license: GPL) 
+ *Numpy 1.3.0 (src) (license: BSD)
+ *Matplotlib 0.98.5.3 (src) (license: BSD)
    
 3. **Primerprospector installation**
 * ``svn co https://pprospector.svn.sourceforge.net/svnroot/pprospector/trunk pprospector``
