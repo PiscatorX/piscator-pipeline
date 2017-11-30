@@ -33,7 +33,7 @@ Nextflow requires Java to to run, for more details follow the details provided h
 ### Primerprospector
 
 1. Firt you must install python dependensies.  Install  pythop-pip a utility for downloading python modules
- *``sudo apt-get install pip``
+ * ``sudo apt-get install pip``
 2. **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
  * Build-essential ``sudo apt-get install build-essential``
 3. Dependencies
