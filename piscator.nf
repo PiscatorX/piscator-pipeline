@@ -47,7 +47,7 @@ input:
     val return_msge  from DB
 
 output:
-    val 'sucess' into compiled_DB
+    val 'success' into compiled_DB
 
     
     
@@ -61,7 +61,8 @@ output:
 
 
 process Get_pairs{
-  
+
+publishDir path: output, mode: 'copy'
   
 input:
    val return_msge from compiled_DB 
