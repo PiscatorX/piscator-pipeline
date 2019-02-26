@@ -1,0 +1,12 @@
+channels:
+- conda-forge
+- bioconda
+- defaults
+dependencies:
+- biopython==1.66
+- matplotlib-venn==0.11.4
+- matplotlib==2.1.2
+- mysql-connector-python==2.2.2
+- pandas==0.17.1
+- scipy==0.19.1
+- python=2.7
