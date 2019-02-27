@@ -10,6 +10,11 @@ class generateTSV(PrimerDB):
 
     def __init__(self):
         
+        parser = argparse.ArgumentParser(description="Generate tsv files for the primers",
+        epilog='NOTE: This utility expects database to be have been populated')
+        parser.add_argument('-o','--output-dir', dest='output_dir')
+        args = parser.parse_args()
+        self.output_dir = args.output_dir if args.output_dir else '.'  
         super(generateTSV, self).__init__()
 
         self.cnx.database = self.DB_NAME  
@@ -27,11 +32,12 @@ class generateTSV(PrimerDB):
                 in self.cursor.fetchall())
 
 
-    def generateTSV(self, ext = '.tsv'):
-    
+    def generateTSV(self):
+        
+        ext = '.tsv'  
         fix_id = lambda primer_id, Dir: primer_id if primer_id.endswith(Dir) else primer_id+Dir
-        save   = lambda primer_id, primer: open(primer_id + ext,'w').write(primer)
-        out = lambda primer_id: primer_id + ext
+        save   = lambda primer_id, primer: open(os.path.join(self.output_dir, primer_id) + ext,'w').write(primer)
+        out = lambda primer_id:  primer_id + ext
         
         output = []
         #pair_data = []

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from matplotlib_venn import venn3_unweighted, venn2_unweighted
 from init_primerDB import PrimerDB
@@ -37,7 +37,7 @@ class PlotData(PrimerDB):
         
     def PlotsLens(self):
 
-        set_style("whitegrid")
+        sns.set_style("whitegrid")
         for mismatch in range(5):
             ampli_lens = {}
             for primer_id in self.primer_ids:

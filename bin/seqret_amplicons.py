@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from init_primerDB import PrimerDB
 from Bio import SeqIO
@@ -14,7 +14,7 @@ class GetAmplicons(PrimerDB):
         super(GetAmplicons, self).__init__()
         
         parser = argparse.ArgumentParser(description="""Save primer data""")
-        parser.add_argument('-r','--reference', dest='ref_seq', action='store',required=True,  type=str)
+        parser.add_argument('reference', dest='ref_seq', action='store',required=True,  type=str)
         args = parser.parse_args()
         self.ref_seq = args.ref_seq
         self.cnx.database = self.DB_NAME  

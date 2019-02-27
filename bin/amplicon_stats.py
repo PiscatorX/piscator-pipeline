@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from init_primerDB import PrimerDB
 import mysql.connector

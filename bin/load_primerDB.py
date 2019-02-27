@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from init_primerDB import PrimerDB
 import mysql.connector
@@ -43,7 +43,7 @@ class LoadDB(PrimerDB):
                     if k in self.table_cols:
                         insert_dict[k] = row_dict[k]
                     else:
-                        print "column {} removed from data not inserted into DB (use -h/--help for help)".format(k)
+                        print("column {} removed from data not inserted into DB (use -h/--help for help)".format(k))
                 if  insert_dict:
                     row_dict = insert_dict
                     insert_dict = {}
@@ -59,7 +59,7 @@ class LoadDB(PrimerDB):
         try:
             self.cursor.execute(sql)
         except mysql.connector.errors.IntegrityError as err:
-            #print err
+            print(err)
             pass
 
 

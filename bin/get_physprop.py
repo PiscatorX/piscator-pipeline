@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from init_primerDB import PrimerDB
 from itertools import product
 import mysql.connector
@@ -12,6 +12,9 @@ import  pprint
 import  shlex
 import  sys
 
+
+
+
 class PhysProp(PrimerDB):
 
     def __init__ (self):
@@ -19,7 +22,7 @@ class PhysProp(PrimerDB):
         super(PhysProp, self).__init__()
         
         parser = argparse.ArgumentParser(description="""Save primer data""")
-        parser.add_argument('-p','--primers-file', dest='primers_file', action='store',required=True,  type=str)
+        parser.add_argument('primers_file')
         parser.add_argument('-w','--windowsize',dest='windowsize',action='store',required=False, type=int)
         parser.add_argument('-s','--shiftincrement', dest='shiftincrement', action='store',required=False,type=int)
         parser.add_argument('-D','--dnaconc', dest='dnaconc', action='store',required=False,default=50,type=int)
@@ -80,30 +83,14 @@ class PhysProp(PrimerDB):
     def populate_results(self, primer_id, primer_results):
         
         primer_results.update({'primer_ID':primer_id})
-         # TABLES['primerprop'] = (
-         #                  " CREATE TABLE `primerprop` ("
-         #                  " `primer` CHAR(30) PRIMARY KEY,"
-         #                  " `TmProd` FLOAT,"
-         #                  " `DeltaS` FLOAT,"
-         #                  " `Length`  INT,"
-         #                  " `GC`     FLOAT,"
-         #                  " `DeltaG` FLOAT,"
-         #                  " `DeltaH` FLOAT,"
-         #                  " `Tm`     FLOAT"
-         #                  " ) ENGINE=InnoDB")
-
-
-         
         sql = """INSERT INTO primerprop
                   (primer, TmProd, DeltaS, Length, GC, DeltaG, DeltaH, Tm)
                    values("{primer_ID}", "{TmProd}", "{DeltaS}", "{Length}", "{GC}", "{DeltaG}", "{DeltaH}", "{Tm}")
                """.format(**primer_results)
-        #pprint.pprint(sql)
-        #print primer_id, primer_results.values()
         try:
             self.cursor.execute(sql)
         except mysql.connector.errors.IntegrityError as err:
-            print err
+            print(err)
             
         self.cnx.commit()
 

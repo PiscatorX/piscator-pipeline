@@ -1,4 +1,4 @@
-#!/usr/bin/python 
+#!/usr/bin/env python 
 
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC

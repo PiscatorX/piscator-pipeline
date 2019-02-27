@@ -7,13 +7,14 @@ import pprint
 import sys
 
 
+
 class PrimerDB(object):
 
     def __init__(self):
 
         """
 
-             Get the filename of csv file with primers and initialise venatorDB database
+             Get the filename of csv file with primers and initialise Piscator database
 
         """
         
@@ -21,7 +22,7 @@ class PrimerDB(object):
         
         self.DB_NAME = config.pop('database')
 
-        self.cnx = mysql.connector.connect(user=config['user'], password=config['password'])
+        self.cnx = mysql.connector.connect(user=config['user'], password=config['password'], host=config['host'])
 
         self.cursor = self.cnx.cursor()
 
@@ -36,9 +37,9 @@ class PrimerDB(object):
             self.cursor.execute("CREATE DATABASE {} DEFAULT CHARACTER SET 'utf8'".format(self.DB_NAME))
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_DB_CREATE_EXISTS:
-                print 'Database "{}" already exists'.format(self.DB_NAME) 
+                print('Database "{}" already exists'.format(self.DB_NAME)) 
             else:
-                raise Exception,err
+                raise Exception(err)
 
             
     def init_tables(self):
@@ -93,7 +94,7 @@ class PrimerDB(object):
              " ) ENGINE=InnoDB")
 
         self.TABLES = TABLES
-        self.DB_tables = TABLES.keys()
+        self.DB_tables = list(TABLES.keys())
 
 
     def create_tables(self):
@@ -102,20 +103,19 @@ class PrimerDB(object):
             self.cnx.database = self.DB_NAME  
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_BAD_DB_ERROR:
-                print('Database does not exists.')
-            else:
-                raise Exception,err
+                print('Database Error')
+                raise Exception(err)
             
-        for table, ddl in self.TABLES.items():
+        for table, ddl in list(self.TABLES.items()):
             try:
                 self.cursor.execute(ddl)
             except mysql.connector.Error as err:
                 
                 if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                    print 'Table "{}" already exists.'.format(table)
+                    print('Table "{}" already exists.'.format(table))
                     
                 else:
-                    raise Exception, err
+                    raise Exception(err)
     
 if __name__ == '__main__':
     primer_db = PrimerDB()

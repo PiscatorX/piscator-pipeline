@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from matplotlib import pyplot as plt
 from init_primerDB import PrimerDB
@@ -9,6 +9,8 @@ import sqlite3
 import pprint
 import ast
 import os
+
+
 
 
 class PhyspropPlot(PrimerDB):
