@@ -9,13 +9,16 @@ import os
 class generateTSV(PrimerDB):
 
     def __init__(self):
-        
+
+        super(generateTSV, self).__init__()
+
         parser = argparse.ArgumentParser(description="Generate tsv files for the primers",
         epilog='NOTE: This utility expects database to be have been populated')
         parser.add_argument('-o','--output-dir', dest='output_dir')
-        args = parser.parse_args()
-        self.output_dir = args.output_dir if args.output_dir else '.'  
-        super(generateTSV, self).__init__()
+        
+        args, unknown = parser.parse_known_args()
+        
+        self.output_dir = args.output_dir if args.output_dir else '.'
 
         self.cnx.database = self.DB_NAME  
 

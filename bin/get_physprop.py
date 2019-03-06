@@ -22,15 +22,14 @@ class PhysProp(PrimerDB):
         super(PhysProp, self).__init__()
         
         parser = argparse.ArgumentParser(description="""Save primer data""")
-        parser.add_argument('primers_file')
+        parser.add_argument('-p','--primers_file')
         parser.add_argument('-w','--windowsize',dest='windowsize',action='store',required=False, type=int)
         parser.add_argument('-s','--shiftincrement', dest='shiftincrement', action='store',required=False,type=int)
         parser.add_argument('-D','--dnaconc', dest='dnaconc', action='store',required=False,default=50,type=int)
         parser.add_argument('-S','--salt', dest='saltconc', action='store', required=False, default=50,type=int)
         parser.add_argument('-t','--temparature', dest='temperature', action='store',default=55,required=False, type=int)
 
-        
-        args = parser.parse_args()
+        args, unknown = parser.parse_known_args()
         
         self.cnx.database = self.DB_NAME  
     

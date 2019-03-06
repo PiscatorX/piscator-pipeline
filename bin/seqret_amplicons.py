@@ -13,10 +13,10 @@ class GetAmplicons(PrimerDB):
 
         super(GetAmplicons, self).__init__()
         
-        parser = argparse.ArgumentParser(description="""Save primer data""")
-        parser.add_argument('reference', dest='ref_seq', action='store',required=True,  type=str)
-        args = parser.parse_args()
-        self.ref_seq = args.ref_seq
+        parser = argparse.ArgumentParser(description="""Save primer data populate mysql database""")
+        parser.add_argument('-r','--reference', help="fasta reference file ")
+        args, unknown = parser.parse_known_args()
+        self.ref_seq = args.reference
         self.cnx.database = self.DB_NAME  
 
         
@@ -41,11 +41,12 @@ class GetAmplicons(PrimerDB):
         for row in amplicon_data:
             #print len(amplicon_records),curr,last
             rec = dict(zip(col_ids, row))
-            print rec
+            #print rec
             try:
                 seq_data = self.ref_seq_dict.get(rec['seq_id'],False)
-            except KeyError:
+            except KeyError as e:
                  print row
+                 raise Exception, e 
             if not seq_data:
                 print 'Not found!'
                 continue

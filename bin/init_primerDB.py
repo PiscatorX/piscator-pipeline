@@ -3,8 +3,12 @@
 from mysql.connector import errorcode
 import db_config as cfg
 import mysql.connector
+import argparse
 import pprint
 import sys
+
+
+
 
 
 
@@ -17,8 +21,22 @@ class PrimerDB(object):
              Get the filename of csv file with primers and initialise Piscator database
 
         """
+        config = {'user':'root',
+             'password' :'Pythonic',
+              'database':'piscator'}
+
+       # 'host': "localhost",
+  
+        #config file stores all the database
+        parser = argparse.ArgumentParser(description="""Compile High-Throughput Sequencing 
+        (HTS) Primer database using a csv primer file.""",
+        epilog='NOTE: This utility expects database to be created and cvs files to have headers')
+
+        parser.add_argument('host')
+
+        self.args, unknown = parser.parse_known_args()
         
-        config =  cfg.mysql
+        config.update({'host': self.args.host } )
         
         self.DB_NAME = config.pop('database')
 
@@ -116,7 +134,7 @@ class PrimerDB(object):
                     
                 else:
                     raise Exception(err)
-    
+                
 if __name__ == '__main__':
     primer_db = PrimerDB()
     primer_db.init_tables()

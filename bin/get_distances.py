@@ -75,7 +75,7 @@ class GetDistances():
                 if (n_array > 100000):
                     dist_matrix = np.random.choice(dist_matrix, 100000,  replace=True)            
                 self.distance_arrays[dist_fname] = dist_matrix
-                print '>>>',dist_fname
+                #print '>>>',dist_fname
                 self.data_len[dist_fname] =  i
         except IOError as err:
             print err
@@ -113,8 +113,8 @@ class GetDistances():
         labels = sorted(lens, key=lens.get, reverse=True)
         dist_data = [ cluster_data[k] for k in labels ]
         locations = dict((i,j) for j,i in enumerate(labels,1))   
-        for k,v in cluster_data.items():
-            print k ,v.shape
+        # for k,v in cluster_data.items():
+        #     print k ,v.shape
         merged_data  = np.concatenate(dist_data)
         y_max, y_min = map(lambda func: func(merged_data), [np.amax, np.amin])
         y_max = y_max + 0.075 * top

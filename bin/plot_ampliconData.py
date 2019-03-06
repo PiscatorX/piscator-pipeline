@@ -24,8 +24,7 @@ class PlotData(PrimerDB):
         parser = argparse.ArgumentParser(description="Plot and analyse amplicon data")
         
         parser.add_argument('-r','--ref', dest='ref_file', action='store', required=True, type=str)
-        
-        args = parser.parse_args()
+        args, unknown = parser.parse_known_args() 
         self.cnx.database = self.DB_NAME  
         self.cursor =  self.cnx.cursor()
         self.ref_len = len(list(SeqIO.parse(args.ref_file,'fasta')))

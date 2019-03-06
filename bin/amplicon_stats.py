@@ -16,7 +16,7 @@ class AmpliconStats(PrimerDB):
          and analyse the results""")
 
         parser.add_argument('-a','--amplicons', dest='amplicons', action='store', required=True, type=str)
-        args = parser.parse_args()
+        args, unknown = parser.parse_known_args()
         
         self.amplicons_output = open(args.amplicons).read()
         self.results_tsv = args.amplicons.replace('rst','tsv')
