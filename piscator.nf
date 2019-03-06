@@ -28,7 +28,7 @@ output = params.output
 
 Channel.fromPath(params.ref_fasta).into{ref1; ref2; ref3}
 
-hostname = ( params.dockerIP == true ) ? params.dockerIP : 'localhost'   
+hostname = ( params.dockerIP != false ) ? params.dockerIP : 'localhost'   
 
 log.info """
 ==========================================================================
