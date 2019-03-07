@@ -28,7 +28,7 @@ output = params.output
 
 Channel.fromPath(params.ref_fasta).into{ref1; ref2; ref3}
 
-hostname = ( params.dockerIP != false ) ? params.dockerIP : 'localhost'   
+hostname = ( params.dockerIP != 'None' ) ? params.dockerIP : 'localhost'   
 
 log.info """
 ==========================================================================
@@ -55,7 +55,7 @@ params.clustalo_threads        		= ${params.clustalo_threads}
 
 process Init_PrimerDB{
   
-    //echo true
+    echo true
 
     input:
 	val hostname
@@ -69,14 +69,16 @@ process Init_PrimerDB{
 
     init_primerDB.py \
     ${hostname}
- 
+
     load_primerDB.py \
     ${hostname} \
     -p ${params.primers_csv} 
     
 """ 
 
+
 }
+
 
 
 
@@ -346,7 +348,7 @@ process Analyse_clusters{
 
     output:
        val  'CDhit_counts*' into hit_plots
-
+ 
    
 """ 
  
@@ -360,9 +362,9 @@ process Analyse_clusters{
 
 
 
-process Analyse_genetic_distances{
+process Analyse_Genetic_dist{
 
-    echo true
+    errorStrategy 'ignore'
     
     publishDir path: output, mode: 'move'
     
@@ -376,6 +378,7 @@ process Analyse_genetic_distances{
 """ 
 
     get_distances.py -t  $params.clustalo_threads
+
      
 """
 

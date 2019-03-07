@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 from mysql.connector import errorcode
-import db_config as cfg
 import mysql.connector
 import argparse
 import pprint

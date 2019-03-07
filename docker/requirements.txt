@@ -1,7 +1,0 @@
-biopython==1.66
-matplotlib-venn==0.11.4
-matplotlib==2.1.2
-mysql-connector-python-rf==2.2.2
-pandas==0.17.1
-scipy==0.19.1
-seaborn==0.8.1

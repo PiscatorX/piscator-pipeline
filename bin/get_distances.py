@@ -173,9 +173,9 @@ class GetDistances():
         if n_clusters > 2:
             top = n_clusters if top < 3 else top
             for i,j in it.combinations(top, 2):
-                print "({},{})".format(i,j),
+                #print "({},{})".format(i,j),
                 H_value, p_value = mstats.kruskalwallis(cluster_data[i], cluster_data[j])
-                print 'H_value: {}, p_value: {}'.format(H_value, p_value)
+                #print 'H_value: {}, p_value: {}'.format(H_value, p_value)
                 y_max = y_max - 0.075
                 i = locations[i]
                 j = locations[j]

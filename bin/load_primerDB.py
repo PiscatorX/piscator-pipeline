@@ -14,14 +14,13 @@ class LoadDB(PrimerDB):
         parser = argparse.ArgumentParser(description="""Compile High-Throughput Sequencing (HTS) Primer database using a csv primer file.""",
         epilog='NOTE: This utility expects database to be created and cvs files to have headers')
         parser.add_argument('-p','--primers-file', dest='primers_file', action='store', 
-                            required=False, type=str)
+                            required=True, type=str)
         parser.add_argument('-c','--custom-header', dest='headers', default=False, action='store_true', 
                             required=False, help="""use cvs headers (default=False). Used when order of column header is different from expected. Column/header are expected in the following order: "Fwd_id, Fwd_Primer, Rev_id, Rev_Primer, Target, gene, Amplicon_length, technology, Reference, Cross_ref, notes". Important! header reading is case sensitive, if provided headers must match the case those provided here""")
 
         self.args, unknown = parser.parse_known_args()
-        
         self.cnx.database = self.DB_NAME  
-        self.headers = self.args.headers
+        self.headers = self.args.headers     
         self.csv_reader = csv.reader(open(self.args.primers_file))
         self.table_cols = ["Fwd_id","Fwd_Primer","Rev_id","Rev_Primer",
                           "gene","Amplicon_length","technology",
@@ -30,7 +29,7 @@ class LoadDB(PrimerDB):
     def LoadCSV(self):
         
         #must skip the first line of csv file
-        top_line = self.csv_reader.next()
+        top_line = next(self.csv_reader)
         csv_headers = top_line if self.headers else self.table_cols
         
         insert_dict = {}
