@@ -18,8 +18,6 @@ RUN git clone  https://github.com/PiscatorX/piscator-pipeline.git
 
 COPY requirements.txt   .
 
-RUN pip install numpy==1.11.1 &&  pip install  -r  requirements.txt
-
 RUN wget https://github.com/pycogent/pycogent/archive/1.5-release.tar.gz && \
     tar -zxvf   1.5-release.tar.gz && \
     cd pycogent-1.5-release && \
@@ -37,7 +35,7 @@ ENV PYTHONPATH /docker/rdp_classifier_2.12:${PYTHONPATH}
 
 ENV PATH ${PATH}:/docker/piscator-pipeline/bin
 
-
+RUN pip install numpy==1.11.1 &&  pip install  -r  requirements.txt
 
 
 
