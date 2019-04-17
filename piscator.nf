@@ -1,34 +1,37 @@
 #!/usr/bin/env nextflow
 
-params.output		= "$PWD/Piscator_out"
+python_virtualenv       = workflow.projectDir+"/python_virtualenv"
+//virtualenv env path for python modules
+//this allows for new versions of python plotting modules
+params.output		= "$PWD/piscator.Out"
 params.primers_csv 	= "primers.csv"
 params.blast_RefSeq 	= "$PWD/M32703.fasta"
-params.taxonomy_mapping = "taxonomy_mapping.txt"
-params.cd_hit_threads  	= 4
-params.clustalo_threads = 2
-params.ref_fasta 	= "/opt/DB_REF/sel_SILVA.fasta"
+params.ref_fasta 	= "/opt/DB_REF/SILVA/TestX.fasta"
+params.taxonomy_mapping	= "/opt/DB_REF/SILVA/TestX.fasta.map"
 cd_hit_clusters 	= Channel.from(0.97)
+ref_fasta               = Channel.value(params.ref_fasta)
+taxonomy_mapping        = Channel.value(params.taxonomy_mapping)
+ref_fasta_path          = file(params.ref_fasta)
+output                  = params.output
+primers_csv             = Channel.fromPath(params.primers_csv)
+hostname                = 'localhost'
+params.taxa_depth	= 7
+//flags for debugging
+params.analyze_primers  = true
+params.analyse_amplicons= true
+params.taxa_coverage	= true
+taxa_depth              = Channel.value(params.taxa_depth)
+
+if ( !ref_fasta.endsWith(".fasta")) {
+    
+    println "Fail! reference fasta sequence must have `.fasta`."
+    
+    exit(1)
+}
 
 
+hits_base = '_' + ref_fasta_path.getName().replace('.fasta','_hits.txt')
 
-
-
-
-//sel_SILVA_132_SSURef_Nr99_tax_silva_full_align_trunc.fasta
-// //primers_csv = file(params.primers_csv)
-// // blast_RefSeq = Channel.value(params.blast_RefSeq)
-// ref_fasta = file(ref_fasta)
-// taxonomy_mapping = file(params.taxonomy_mapping)
-// taxa_coverage_dir = "$output/taxa_coverage"
-// hits_ext = '_'+ref_fasta.replace('.fasta','')+'_hits.txt'
-
-
-
-output = params.output
-
-Channel.fromPath(params.ref_fasta).into{ref1; ref2; ref3}
-
-hostname = ( params.dockerIP != 'None' ) ? params.dockerIP : 'localhost'   
 
 log.info """
 ==========================================================================
@@ -51,88 +54,270 @@ params.clustalo_threads        		= ${params.clustalo_threads}
 """
 
 
-
-
 process Init_PrimerDB{
   
     echo true
-
+    errorStrategy 'retry'
+    maxRetries 3
     input:
 	val hostname
-	file params.primers_csv
-
+        file primers_csv
+	
     output:
-	val 'success' into compiled_DB 
+	val 'success' into compiled_DB  
 
-        
+    script:
+	hostname = ( params.dockerIP != 'None' ) ? params.dockerIP : 'localhost'   
+
 """
-
+    #test.py 
+    
     init_primerDB.py \
     ${hostname}
 
     load_primerDB.py \
     ${hostname} \
-    -p ${params.primers_csv} 
+    -p ${primers_csv}
     
 """ 
-
-
+ 
 }
-
-
 
 
 process get_tsv{
 
     //echo true
-    publishDir path: output, mode: 'copy'
+    publishDir path: "${output}/tsv_files", mode: 'copy'
+    
     input:
+        val return_msge from compiled_DB 
         val hostname
-	val return_msge from compiled_DB 
+
 
     output:
-	stdout Fwd_Rev_pair 
-        file ("tsv_files/*.tsv") into (data_tsv,primer_fasta, primers_physchem, primers_analyze) mode flatten
-    script:
-	tsv_dir="tsv_files"
-    
+	 stdout Fwd_Rev_pair 
+         file ("*.tsv") into (pair_tsv, primer_fasta, primers_physchem, primers_analyze) mode flatten
+
 """
-    mkdir ${tsv_dir}
-    gen_tsv_primers.py ${hostname}  -o  ${tsv_dir} 
-     
+
+    gen_tsv_primers.py \
+    ${hostname}  
+    
 """
 
 }
-
-
 
 
 Fwd_Rev_pair.splitCsv()
 	    .flatten()
 	    .collate(2)
-	    .into{primers_pair; temp }
+	    .into{primers_pair1;
+	          primers_pair2}
 
 
 
-
-process Generate_fasta{
+process analyze_primers{
     
-    publishDir path: "${output}/primers_fasta", mode: 'copy'
-
+    
+    publishDir path: "${output}/primers_analysis", mode: 'copy'
+    
     input:
-       file primer_tsv from primer_fasta.flatten()
-    
+         file primer from primers_analyze
+         val ref_fasta
+	 
     output:
-	file primer_tsv into primers_fasta
-
-   
+        file '*_hits.txt' into (primer_results1, primer_results2)
+        file "*.ps" into analysis_charts
+	
+    when:
+       params.analyze_primers == true
+    
 """
 
-    generate_fasta.py  -p  ${primer_tsv}
-      
+    analyze_primers.py \
+    -f  $ref_fasta \
+    -P $primer
+
 """
 
 }
+
+
+
+process get_amplicons_and_reads{
+
+    publishDir path: "${output}/amplicons", mode: 'copy'
+    
+    input:
+	set fwd_tsv, rev_tsv  from primers_pair1
+	file(hits) from primer_results1.collect()
+        val  ref_fasta	
+
+   output:
+        file '*.fasta'  into reads_and_amplicons
+        file '*amplicons.fasta'  into amplicons
+        set fwd_hit, rev_hit into primer_hits
+	
+    when:
+        params.taxa_coverage == true
+
+   script:  
+       
+       fwd_hit = fwd_tsv.replace('.tsv','') + hits_base
+       rev_hit = rev_tsv.replace('.tsv','') + hits_base 
+
+
+    
+"""
+
+    get_amplicons_and_reads.py \
+    -i $fwd_hit:$rev_hit \
+    -R 300 \
+    -f $ref_fasta \
+    -d p \
+    -v
+
+"""
+
+}
+
+
+process analyse_amplicons{
+
+    errorStrategy 'ignore'
+    publishDir path: "${output}/amplicon_plots", mode: 'copy'
+
+    input:
+        file amplicons from amplicons
+
+    output:
+        file '*.ps' into amplicon_histograms
+
+    when:
+       params.analyse_amplicons == true
+    
+"""
+
+   amplicons_histograms.py \
+   -f $amplicons
+
+"""
+
+}
+
+
+process taxa_coverage{
+ 
+    publishDir path: "${output}/taxonomy_coverage", mode: 'move'
+    
+    input:
+        set fwd_hit, rev_hit from primer_hits
+        file hits from primer_results2.collect()	
+        val taxonomy_mapping
+	val taxa_depth
+
+    output:
+	file("${pair_id}") into taxa_coverage_plots
+
+    when:
+        params.taxa_coverage == true
+
+    script:
+        pair_id =  fwd_hit.replace(hits_base,'')+'_'+rev_hit.replace(hits_base,'')        
+     	 
+"""
+
+   taxa_coverage.py \
+   -i ${fwd_hit}:${rev_hit} \
+   --taxa_fp ${taxonomy_mapping} \
+   -d ${taxa_depth} \
+   -o ${pair_id} \
+   -p 
+
+"""    
+
+}
+
+
+process compile_taxa_coverage{
+
+    //echo true
+    input:
+        val files from taxa_coverage_plots.collect()
+	val taxa_depth
+	
+
+"""
+depth=${taxa_depth}
+
+cd "${output}/taxonomy_coverage"
+
+for level in `seq ${taxa_depth}` ;
+
+do
+    mkdir -pv level_\${level}
+    for  pdf  in  `ls  */*/*_level_\${level}.pdf`
+
+        do
+
+	    pdf=`realpath \${pdf}`
+	    ln -fs \${pdf} -t  level_\${level}
+
+        done
+    
+done
+
+"""
+
+}
+
+
+process taxa_assignment{
+
+    //echo true
+    errorStrategy 'ignore'
+    publishDir path: "${output}", mode: 'copy'
+    input:
+	file seq from reads_and_amplicons.flatten()
+        val taxonomy_mapping
+        val  ref_fasta
+    output:
+        file "taxa_accuracy_reports" into taxa_reports
+    when:
+       params.analyse_amplicons == true
+
+    
+"""	
+    
+    taxa_assignment_report.py \
+    -t ${taxonomy_mapping} \
+    -f ${seq} \
+    -d 7 \
+    -T ${ref_fasta} \
+    -o  taxa_accuracy_reports
+
+"""
+	
+}
+
+
+// process Generate_fasta{
+
+
+//     input:
+//        file primer_tsv from primer_fasta.flatten()
+    
+//     output:
+// 	file primer_tsv into primers_fasta
+
+   
+// """
+//     generate_fasta.py \
+//     -p  ${primer_tsv}
+      
+// """
+
+// }
 
 
 
@@ -148,13 +333,15 @@ process Get_PhysProp {
 
     
 """
+    
+
     get_physprop.py \
     ${hostname} \
    -p ${primer}
 
 """
-}
 
+}
 
 
 
@@ -163,14 +350,17 @@ process physchem_plots{
     publishDir path: "${output}/physchem_plots", mode: 'copy'
     input:
          val hostname
-	 physchem_data.collect()
+	 val data from physchem_data.collect()
 
     output:
        file '*.pdf' into propplots
+
+    
+"""    
+   source ${python_virtualenv}/bin/activate
    
-"""
-    plot_physprop.py \
-    ${hostname}
+   plot_physprop.py \
+   ${hostname}
 
 """
 
@@ -179,16 +369,19 @@ process physchem_plots{
 
 
 
-process phase_pairs{
 
-    echo true
+
+process pair_tsv{
+
+    //echo true
     input:
-	file "*" from data_tsv.collect()
-	set fwd, rev from  primers_pair
+	file "*" from pair_tsv.collect()
+	set fwd, rev from  primers_pair2
 
     output:
 	file '*_*.tsv' into primersearch_tsv
 
+    
 """
  
    get_pairs.py \
@@ -202,15 +395,19 @@ process phase_pairs{
 
 
 
-
 process emboss_primersearch{
 
+    echo true
+    publishDir path: "${output}/primersearch", mode: 'copy'
     input:
-	file  ref_fasta from ref1
-	file  primer_pair from primersearch_tsv
+	file primer_pair from primersearch_tsv
+        val ref_fasta	
 
     output:
-        file 'amplicons.rst' into amplicon_results mode flatten
+        file("${outfile}") into amplicon_results mode flatten
+
+    script:
+	outfile = primer_pair.getName().replace('tsv','rst') 
     
     
 """
@@ -218,53 +415,49 @@ process emboss_primersearch{
     -seqall ${ref_fasta} \
     -infile ${primer_pair} \
     -mismatchpercent 15 \
-    -verbose \
-    -outfile amplicons.rst 
+    -outfile ${outfile} \
+    -verbose 
 
 """
 
 }
 
 
-
-
 process amplicon_stats{
 
-    publishDir path: output, mode: 'copy'
-        echo true
-  
+   
     input:
         val hostname
         file amplicons from amplicon_results
 
     output:
-        val '*.tsv' into (amplicon_stats1, amplicon_stats2 ) mode flatten
+        file amplicons into (amplicon_stats1, amplicon_stats2 ) mode flatten
 
 """
 
     amplicon_stats.py \
     ${hostname} \
     --amplicon $amplicons
-
+      
 """
 
 }
 
 
-
-   
 process  plot_ampliconData{
 
-    publishDir path: "${output}/EmbossAmplicons", mode: 'move'
+    
+    publishDir path: "${output}/emboss_amplicons", mode: 'move'
     input:
-        val  stats from amplicon_stats1.collect()
-        file ref_fasta from ref2
+        val stats from amplicon_stats1.collect()
+        val ref_fasta
 
     output:
          file '*.pdf'  into Plots
         
 
 """   
+   source ${python_virtualenv}/bin/activate 
 
    plot_ampliconData.py \
    ${hostname} \
@@ -276,15 +469,14 @@ process  plot_ampliconData{
 
 
 
-
 process amplicon_fasta_gen{
 
     publishDir path: "${output}/emboss_fasta", mode: 'copy'
-    
+   
     input:
         val hostname
         val stats from amplicon_stats2.collect()
-        file ref_fasta from ref3
+        val ref_fasta
     
     output:
         file "*.fasta" into amplicon_fasta mode flatten
@@ -301,14 +493,11 @@ process amplicon_fasta_gen{
 }
 
 
-
-
 process cd_hit_est{
 
     maxForks 1
 
-    publishDir path: "${output}/CD-hit", mode: 'copy'
-  
+    publishDir path: "${output}/CD-hit", mode: 'copy' 
     input:
         each cluster_perc from  cd_hit_clusters
         each amplicons from amplicon_fasta
@@ -338,11 +527,9 @@ process cd_hit_est{
 
 
 
-
-process Analyse_clusters{
+process analyse_clusters{
   
-    publishDir path: output, mode: 'copy'  
-
+    publishDir path: "${output}/analyse_clusters", mode: 'copy'  
     input:  
         file fasta_cluster from cdhit_clusters.collect()
 
@@ -362,28 +549,26 @@ process Analyse_clusters{
 
 
 
-process Analyse_Genetic_dist{
+process analyse_genetic_distances{
 
-    errorStrategy 'ignore'
-    
-    publishDir path: output, mode: 'move'
-    
+    //errorStrategy 'ignore'
+    publishDir path: "${output}/genetic_distances", mode: 'move'
     input:  
 	file seq_hits from cd_hits.collect()
     
     output:
-	file "PrimerVar_*" into distance_plots
+	file "*.pdf" into distance_plots
 
    
-""" 
+"""    
+    source ${python_virtualenv}/bin/activate 
 
-    get_distances.py -t  $params.clustalo_threads
-
+    get_distances.py \
+    -t $params.clustalo_threads
      
 """
 
 }
-
 
 
 
@@ -403,159 +588,22 @@ process Analyse_Genetic_dist{
 
 // // }
 
+workflow.onComplete {
 
-// process Analyze_primers {
-  
-// publishDir path: output, mode: 'copy'
-  
-// input:
-//       val  primer from primers_analyze.flatten() 
-//       file ref_fasta
-      
-// output:
-//      file '*_hits.txt' into primer_results1
-//      file "*.ps" into analysis_charts
-     
-// """
+  println """
 
-//    analyze_primers.py -f  $ref_fasta -P $primer
-
-// """
-
-// }
+    Pipeline execution summary
+    ---------------------------
+    Completed at: ${workflow.complete}
+    Duration    : ${workflow.duration}
+    Success     : ${workflow.success}
+    workDir     : ${workflow.workDir}
+    exit status : ${workflow.exitStatus}
+    Error report: ${workflow.errorReport ?: '-'}
+    """
+}
 
 
 
 
-// process Pair_hits{
 
-// maxForks 1
-
-// input:
-//     set fwd, rev from  primers_raw
-                                
-// output:
-//     stdout data_out  into hits
-//     set file(fwd_hit),  file(rev_hit) into primer_hits1,
-//                                primer_hits2
-
-// script:
-//     fwd_hit = fwd.replace('.tsv','')+hits_ext 
-//     rev_hit = rev.replace('.tsv','')+hits_ext
-
-    
-// """
-
-//     pairing_block.py -p  "$output/$fwd_hit" "$output/$rev_hit"
-  
-     
-// """
-
-// }
-
-
-// process Get_amplicons_and_reads{
-
-//   //publishDir path: output, mode: 'copy'
-
-// input:
-//      set fwd_hit, rev_hit from primer_hits1
-     
-// output:
-//      file '*amplicons.fasta'  into amplicon_seqs
-//      file '*reads.fasta'  into amplicon_reads
-
-
-// """
-   
-//    get_amplicons_and_reads.py -f $ref_fasta -R 300 -d p -i $fwd_hit:$rev_hit
-
-// """
-
-// }
-
-
-
-
-// process Analyse_amplicons{
-
-// errorStrategy 'ignore'
-// publishDir path: output, mode: 'copy'
-
-// input:
-//     file amplicons from amplicon_seqs
-
-// output:
-//     file '*.ps' into amplicon_histograms
-
-    
-// """
-
-//    amplicons_histograms.py -f $amplicons
-
-// """
-
-// }
-
-
-
-
-// process Read_taxonomy{
-  
-// errorStrategy 'ignore'
-// publishDir path: output, mode: 'copy'
-
-  
-// input:
-//    file reads from amplicon_reads.flatten()
-//    file taxonomy_mapping
-   
-// output:
-//     file "*reads_accuracy_report.txt" into reads_accuracy_reports
-//     file "*reads_assignments.txt" into reads_assignments
-
-// """
-
-//    taxa_assignment_report.py -t $params.taxonomy_mapping -f $reads
-
-// """
-
-// }
-
-
-
-
-// process Taxa_coverage{
- 
-
-// publishDir path: taxa_coverage_dir, mode: 'copy'
-
-// input:
-//     set fwd_hit,  rev_hit from primer_hits2
-//     file taxonomy_mapping
-
-    
-
-// """
-
-//    taxa_coverage.py -i $fwd_hit:$rev_hit --taxa_fp $taxonomy_mapping -p -d 7 -o $taxa_coverage_dir
-
-// """    
-
-// }
-
-
-// workflow.onComplete {
-
-//   println """
-
-//     Pipeline execution summary
-//     ---------------------------
-//     Completed at: ${workflow.complete}
-//     Duration    : ${workflow.duration}
-//     Success     : ${workflow.success}
-//     workDir     : ${workflow.workDir}
-//     exit status : ${workflow.exitStatus}
-//     Error report: ${workflow.errorReport ?: '-'}
-//     """
-// }
