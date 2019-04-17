@@ -96,7 +96,7 @@ class GetDistances():
             [f_name  for f_name in  self.f_list if perc_id in f_name  ]
         
         for perc_id in self.cluster_fnames:
-            plt_fname = ''.join(['PrimerVar_',perc_id,'.', self.plot_type])
+            plt_fname = ''.join(['genetic_distances_',perc_id,'.', self.plot_type])
             data_files = self.cluster_fnames[perc_id]
             if len(data_files) == 1:
                 continue

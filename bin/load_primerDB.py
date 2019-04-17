@@ -2,6 +2,7 @@
 
 from init_primerDB import PrimerDB
 import mysql.connector
+import pprint
 import argparse
 import csv
 
@@ -26,7 +27,9 @@ class LoadDB(PrimerDB):
                           "gene","Amplicon_length","technology",
                           "Reference","Cross_ref","notes"]
         
-    def LoadCSV(self):
+        
+        
+    def LoadCSV(self):        
         
         #must skip the first line of csv file
         top_line = next(self.csv_reader)
@@ -34,7 +37,9 @@ class LoadDB(PrimerDB):
         
         insert_dict = {}
         for row in self.csv_reader:
+            
             row_dict = dict(zip(csv_headers, map(lambda w: w.strip(), row)))
+        
             if self.headers:
                 for k in row_dict:
                     if k in self.table_cols:
@@ -51,7 +56,7 @@ class LoadDB(PrimerDB):
         
         cols = ','.join(row_dict.keys()) 
         values = ','.join( '"'+val.translate(None,""""'""")+'"'  for val in  row_dict.values())
-        sql = """INSERT INTO primers ({}) VALUES ({})""".format(cols, values)
+        sql = """INSERT IGNORE   INTO primers ({}) VALUES ({})""".format(cols, values)
         
         try:
             self.cursor.execute(sql)
@@ -59,20 +64,16 @@ class LoadDB(PrimerDB):
             print(err)
             pass
 
+    def count_primers(self):
+        sql = """SELECT count(Fwd_id), count(Rev_id) from primers"""
+        self.cursor.execute(sql)
+        results = self.cursor.fetchall()
+        fwd_count, rev_count = results[0]
+        assert  fwd_count == rev_count, "Number of fwd primers and rev primers are not the same in the database"
+        print("\n{} primer records loaded on \"{}\"  database.\n".format(fwd_count, self.DB_NAME))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-LoadDB = LoadDB()
-LoadDB.LoadCSV()
+if __name__ == '__main__':
+    LoadDB = LoadDB()
+    LoadDB.LoadCSV()
+    LoadDB.count_primers()
