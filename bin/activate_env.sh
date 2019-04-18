@@ -1,5 +1,5 @@
-#!/bin/bash
+#!/bin/bash -eu
 
-
-source ${VIRTUAL_ENV}/bin/activate
-echo "Changed to virtual env ${VIRTUAL_ENV}"
+basedir=`dirname ${BASH_SOURCE}`
+activate_path=${basedir/bin/}python_virtualenv/bin/activate
+source ${activate_path} && echo "${activate_path}"

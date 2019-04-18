@@ -7,18 +7,15 @@ RUN apt update  && apt install -y \
     clustalo \
     emboss \
     git \
-    python2.7 \
+    libfreetype6-dev \
+    libpng-dev \
+    libx11-dev \
     python-pip \
+    python2.7 \
     unzip \
-    wget
+    wget  
 
 WORKDIR /docker
-
-RUN  git clone  https://github.com/PiscatorX/piscator-pipeline.git
-
-ENV  PATH ${PATH}:/docker/piscator-pipeline/bin
-
-COPY requirements.txt   .
 
 RUN wget https://sourceforge.net/projects/rdp-classifier/files/rdp-classifier/rdp-classifier%20v2.0/rdp_classifier_2.0.tar.gz
 
@@ -40,25 +37,30 @@ RUN wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.ta
 
 COPY *requirements.txt   /docker/
 
-RUN apt update  && apt install -y \
-    build-essential \
-    clustalo \
-    emboss \
-    git \
-    libfreetype6-dev \
-    libpng-dev \
-    libx11-dev \
-    python-pip \
-    python2.7 \
-    unzip \
-    wget  
-
 RUN pip install  -r  main-requirements.txt
 
-COPY test.py   /docker/
+RUN git clone  https://github.com/PiscatorX/piscator-pipeline.git
 
-ENV PATH /docker:${PATH}
+ENV PATH /docker/piscator-pipeline/bin:\
+/docker:\
+${PATH}
 
+RUN mkdir piscator-pipeline/python_virtualenv
 
+RUN virtualenv  piscator-pipeline/python_virtualenv 
 
+ENV VIRTUAL_ENV "/docker/piscator-pipeline/python_virtualenv"
 
+ENV _OLD_VIRTUAL_PATH ${PATH}
+
+ENV PATH ${VIRTUAL_ENV}/bin:${PATH}
+
+RUN pip install  -r env-requirements.txt 
+
+ENV PATH ${_OLD_VIRTUAL_PATH} 
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt install -y python-tk
+
+RUN git clone  https://github.com/PiscatorX/piscator-pipeline.git

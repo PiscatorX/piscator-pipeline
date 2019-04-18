@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from matplotlib import pyplot as plt
 from init_primerDB import PrimerDB
 import seaborn as sns
 import pandas as pd
@@ -9,10 +8,13 @@ import sqlite3
 import pprint
 import ast
 import os
+import matplotlib as mpl
+if os.environ.get('DISPLAY','') == '':
+        print('no display found. Using non-interactive Agg backend')
+            mpl.use('Agg')
+from matplotlib import pyplot as plt
 
-
-
-
+            
 class PhyspropPlot(PrimerDB):
 
     def  __init__(self):

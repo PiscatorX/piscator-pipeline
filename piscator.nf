@@ -6,8 +6,8 @@ python_virtualenv       = workflow.projectDir+"/python_virtualenv"
 params.output		= "$PWD/piscator.Out"
 params.primers_csv 	= "primers.csv"
 params.blast_RefSeq 	= "$PWD/M32703.fasta"
-params.ref_fasta 	= "/opt/DB_REF/SILVA/TestX.fasta"
-params.taxonomy_mapping	= "/opt/DB_REF/SILVA/TestX.fasta.map"
+params.ref_fasta 	= "$PWD/TestX.fasta"
+params.taxonomy_mapping	= "$PWD/TestX.fasta.map"
 cd_hit_clusters 	= Channel.from(0.97)
 ref_fasta               = Channel.value(params.ref_fasta)
 taxonomy_mapping        = Channel.value(params.taxonomy_mapping)
@@ -357,7 +357,7 @@ process physchem_plots{
 
     
 """    
-   source ${python_virtualenv}/bin/activate
+   source activate_env.sh
    
    plot_physprop.py \
    ${hostname}
@@ -457,7 +457,7 @@ process  plot_ampliconData{
         
 
 """   
-   source ${python_virtualenv}/bin/activate 
+   source activate_env.sh
 
    plot_ampliconData.py \
    ${hostname} \
@@ -561,7 +561,7 @@ process analyse_genetic_distances{
 
    
 """    
-    source ${python_virtualenv}/bin/activate 
+    source activate_env.sh 
 
     get_distances.py \
     -t $params.clustalo_threads
