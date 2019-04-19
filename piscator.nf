@@ -274,7 +274,7 @@ done
 
 process taxa_assignment{
 
-    //echo true
+    echo true
     errorStrategy 'ignore'
     publishDir path: "${output}", mode: 'copy'
     input:
@@ -551,7 +551,7 @@ process analyse_clusters{
 
 process analyse_genetic_distances{
 
-    //errorStrategy 'ignore'
+    errorStrategy 'ignore'
     publishDir path: "${output}/genetic_distances", mode: 'move'
     input:  
 	file seq_hits from cd_hits.collect()
