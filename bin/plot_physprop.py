@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import os
 import matplotlib as mpl
 if not os.environ.get('DISPLAY',''):

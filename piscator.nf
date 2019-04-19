@@ -4,7 +4,7 @@ python_virtualenv       = workflow.projectDir+"/python_virtualenv"
 //virtualenv env path for python modules
 //this allows for new versions of python plotting modules
 params.output		= "$PWD/piscator.Out"
-params.primers_csv 	= "primers.csv"
+params.primers_csv 	= "primers.csv2"
 params.blast_RefSeq 	= "$PWD/M32703.fasta"
 params.ref_fasta 	= "$PWD/TestX.fasta"
 params.taxonomy_mapping	= "$PWD/TestX.fasta.map"

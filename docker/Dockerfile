@@ -2,6 +2,8 @@ FROM  ubuntu:18.04
 
 MAINTAINER Andrew Ndhlovu (drewxdvst@outlook.com)
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt update  && apt install -y \
     build-essential \
     clustalo \
@@ -12,6 +14,7 @@ RUN apt update  && apt install -y \
     libx11-dev \
     python-pip \
     python2.7 \
+    python-tk \
     unzip \
     wget  
 
@@ -38,7 +41,7 @@ RUN wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.ta
 COPY *requirements.txt   /docker/
 
 RUN pip install  -r  main-requirements.txt
-
+ARG CACHEBUST=1
 RUN git clone  https://github.com/PiscatorX/piscator-pipeline.git
 
 ENV PATH /docker/piscator-pipeline/bin:\
@@ -59,8 +62,5 @@ RUN pip install  -r env-requirements.txt
 
 ENV PATH ${_OLD_VIRTUAL_PATH} 
 
-ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt install -y python-tk
 
-RUN git clone  https://github.com/PiscatorX/piscator-pipeline.git

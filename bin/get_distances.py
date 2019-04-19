@@ -1,4 +1,8 @@
 #! /usr/bin/env python
+import os
+import matplotlib as mpl
+if not os.environ.get('DISPLAY',''):
+    mpl.use("Agg")
 import matplotlib.pyplot as plt
 from scipy.stats import mstats
 import itertools as it
