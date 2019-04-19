@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+import os
+import matplotlib as mpl
+if not os.environ.get('DISPLAY',''):
+    mpl.use("Agg")
+from matplotlib import pyplot as plt
 from init_primerDB import PrimerDB
 import seaborn as sns
 import pandas as pd
@@ -7,12 +12,8 @@ import argparse
 import sqlite3
 import pprint
 import ast
-import os
-import matplotlib as mpl
-if os.environ.get('DISPLAY','') == '':
-    print("no display found. Using non-interactive Agg backend")
-    mpl.use("Agg")
-from matplotlib import pyplot as plt
+
+
 
 
 
