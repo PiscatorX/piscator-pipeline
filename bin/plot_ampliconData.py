@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-
+import os
+import matplotlib as mpl
+if not os.environ.get('DISPLAY',''):
+    mpl.use("Agg")
 from matplotlib_venn import venn3_unweighted, venn2_unweighted
 from init_primerDB import PrimerDB
 from matplotlib import pyplot as plt
