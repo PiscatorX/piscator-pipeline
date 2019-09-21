@@ -41,7 +41,7 @@ RUN wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.ta
 COPY *requirements.txt   /docker/
 
 RUN pip install  -r  main-requirements.txt
-ARG CACHEBUST=1
+ARG CACHEBUST=5
 RUN git clone  https://github.com/PiscatorX/piscator-pipeline.git
 
 ENV PATH /docker/piscator-pipeline/bin:\
@@ -62,5 +62,8 @@ RUN pip install  -r env-requirements.txt
 
 ENV PATH ${_OLD_VIRTUAL_PATH} 
 
+RUN apt install -y cd-hit
 
+ENV RDP_JAR_PATH /docker/rdp_classifier/rdp_classifier-2.0.jar
 
+RUN apt install -y  openjdk-8-jdk
