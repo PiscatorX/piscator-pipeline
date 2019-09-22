@@ -7,9 +7,14 @@ import sys
 
 
 
-def  parse_data(reference, select, outfname):
+def  parse_data(reference, select, names,  outfname):
     global select_list
-    select_list =  [ line.strip().lower() for line in select.read().splitlines() ]
+    
+    if select:
+        select_list =  select.read().lower().split()
+    elif names:
+        select_list = [ entry.lower() for entry in names ]
+        
     seq_data  = SeqIO.parse(reference, "fasta")
     select_seq_data =  []
     for rec in seq_data:
@@ -20,12 +25,12 @@ def  parse_data(reference, select, outfname):
     outfname.close()
 
 
-    
 def is_select(taxa_data):
 
     for rank in select_list:
         if rank in taxa_data:
             return True
+        
     return False
 
 
@@ -33,7 +38,10 @@ def is_select(taxa_data):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("get select silva sequences based on taxonomy provided")
     parser.add_argument('reference', type=argparse.FileType('r'),  help = 'fasta reference file')
-    parser.add_argument('-s','--select', type=argparse.FileType('r'), help = 'list ranks to look for', required=True )
-    parser.add_argument('-o','--outfname', type=argparse.FileType('w'), help = 'list of words to look for in silva taxonomic', required = True)
+    parser.add_argument('-s','--select', type=argparse.FileType('r'), help = 'file containing list of taxonomic names/words on each to filter for')
+    parser.add_argument('-n','--names', nargs='+', help = 'space separated taxonomic ranks')
+    parser.add_argument('-o','--outfname', type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
     args = parser.parse_args()
-    parse_data(args.reference, args.select, args.outfname)
+    if not (args.select or args.names):
+        parser.error('At least one type of input must be provied, chose either a file for  --select or  command line arguments to  --names. Try --help for more.')
+    parse_data(args.reference, args.select, args.names,  args.outfname)
