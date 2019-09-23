@@ -16,6 +16,7 @@ class  SilvaFilter(object):
         self.names     = args.names
         self.outfname  = args.outfname
         self.remove    = [ taxon.lower() for taxon in args.remove ]
+        self.outformat = args.outformat
         
         if args.select:
             self.select_list =  args.select.read().lower().split()
@@ -43,7 +44,7 @@ class  SilvaFilter(object):
                      continue
                  rec.description = ';'.join(clean_taxon[:6])
                  select_seq_data.append(rec)
-        SeqIO.write(select_seq_data, self.outfname, self.outfmat)
+        SeqIO.write(select_seq_data, self.outfname, self.outformat)
         outfname.close()
 
                  
@@ -62,6 +63,7 @@ if __name__ == '__main__':
     parser.add_argument('reference', type=argparse.FileType('r'),  help = 'fasta reference file')
     parser.add_argument('-s','--select', type=argparse.FileType('r'), help = 'file containing list of taxonomic names/words on each to filter for')
     parser.add_argument('-f','--informat', default = "fasta")
+    parser.add_argument('-F','--outformat', default = "fasta")
     parser.add_argument('-n','--names', nargs='+', help = 'space separated taxonomic ranks')
     parser.add_argument('-o','--outfname', default = "filter.fasta", type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
     parser.add_argument('-r','--remove', nargs='+', default = ['SAR', 'Alveolata', 'Stramenopiles', 'Diatomea'] , help = 'list of taxonomic to remove sequences', required = False)
