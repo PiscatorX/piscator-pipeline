@@ -2,46 +2,74 @@
 
 from Bio import SeqIO
 import argparse
+import pprint
 import sys
 
 
 
+class  SilvaFilter(object):
 
-def  parse_data(reference, select, names,  outfname):
-    global select_list
-    
-    if select:
-        select_list =  select.read().lower().split()
-    elif names:
-        select_list = [ entry.lower() for entry in names ]
+    def  __init__(self, args):
+
+        self.seq_data  = SeqIO.parse(args.reference, args.format) 
+        self.select    = args.select
+        self.names     = args.names
+        self.outfname  = args.outfname
+        self.remove    = [ taxon.lower() for taxon in args.remove ]
         
-    seq_data  = SeqIO.parse(reference, "fasta")
-    select_seq_data =  []
-    for rec in seq_data:
-        taxa_data = rec.description.lower().split(';')
-        if is_select(taxa_data):
-            select_seq_data.append(rec)
-    SeqIO.write(select_seq_data, outfname,'fasta')
-    outfname.close()
+        if args.select:
+            self.select_list =  args.select.read().lower().split()
+            
+        elif args.names:
+            self.select_list = [ entry.lower() for entry in args.names ]
 
-
-def is_select(taxa_data):
-
-    for rank in select_list:
-        if rank in taxa_data:
-            return True
         
-    return False
+    def  parse_data(self):
 
+        
+        select_seq_data =  []
+        for rec in self.seq_data:
+             #print(rec)
+             taxon_data = rec.description.split(';')
+             # for taxon in taxon_data:
+             #     print(taxon)
+                 #if taxon not in self.remove ]
+             clean_taxon = [ taxon for taxon in taxon_data if taxon.lower() not in self.remove ]
+             if self.is_select(clean_taxon):
+                 if "uncultured"  in  clean_taxon:
+                     continue
+                 n = len(clean_taxon)
+                 if n < 6:
+                     continue
+                 rec.description = ';'.join(clean_taxon[:6])
+                 select_seq_data.append(rec)
+        SeqIO.write(select_seq_data, self.outfname, self.outfmat)
+        outfname.close()
 
+                 
+    def is_select(self, taxa_data):
+
+        for taxon in self.select_list:
+            if taxon in map(lambda x:x.lower(), taxa_data):
+                return True
+            
+        return False
+            
+        
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser("get select silva sequences based on taxonomy provided")
     parser.add_argument('reference', type=argparse.FileType('r'),  help = 'fasta reference file')
     parser.add_argument('-s','--select', type=argparse.FileType('r'), help = 'file containing list of taxonomic names/words on each to filter for')
+    parser.add_argument('-f','--informat', default = "fasta")
     parser.add_argument('-n','--names', nargs='+', help = 'space separated taxonomic ranks')
-    parser.add_argument('-o','--outfname', type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
+    parser.add_argument('-o','--outfname', default = "filter.fasta", type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
+    parser.add_argument('-r','--remove', nargs='+', default = ['SAR', 'Alveolata', 'Stramenopiles', 'Diatomea'] , help = 'list of taxonomic to remove sequences', required = False)
+    #parser.add_argument('-x','--reject', nargs='+', default = ['SAR', 'Alveolata', 'Stramenopiles', 'Diatomea'], help = 'list of taxonomic to reject sequences', required = False)
     args = parser.parse_args()
     if not (args.select or args.names):
         parser.error('At least one type of input must be provied, chose either a file for  --select or  command line arguments to  --names. Try --help for more.')
-    parse_data(args.reference, args.select, args.names,  args.outfname)
+    silva = SilvaFilter(args)
+    silva.parse_data()
+
+        #parse_data(args.reference, args.select, args.names,  args.outfname)
