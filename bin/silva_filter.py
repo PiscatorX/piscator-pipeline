@@ -36,7 +36,9 @@ class  SilvaFilter(object):
                  if set(self.reject).intersection(clean_taxon):
                      continue
                  n = len(clean_taxon)
+                 #N=6 domain, phylum, class, order, family, and genus.
                  if n < self.taxon_limit:
+                     
                      continue
                  rec.description = ';'.join(clean_taxon[:6])
                  select_seq_data.append(rec)
@@ -63,7 +65,7 @@ if __name__ == '__main__':
     parser.add_argument('-t','--taxon_limit',type = int, default = 6)
     parser.add_argument('-n','--names', nargs='+', help = 'space separated taxonomic ranks')
     parser.add_argument('-o','--outfname', default = "filter.fasta", type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
-    parser.add_argument('-r','--remove', nargs='+', default = ['SAR', 'Alveolata', 'Stramenopiles', 'Diatomea'] , help = 'list of taxonomic to remove sequences', required = False)
+    parser.add_argument('-r','--remove', nargs='+', default = ['SAR', 'Alveolata', 'Stramenopiles', 'Diatomea', 'Excavata','Discoba','Discicristata','Euglenida','Euglenea'] , help = 'list of taxonomic to remove sequences', required = False)
     parser.add_argument('-x','--reject', nargs='+', default = ["uncultured"] , help = 'list of taxonomic to reject sequences', required = False)
     args = parser.parse_args()
     if not (args.select or args.names):
