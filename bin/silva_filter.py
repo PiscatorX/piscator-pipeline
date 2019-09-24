@@ -64,8 +64,8 @@ if __name__ == '__main__':
     parser.add_argument('-F','--outformat', default = "fasta")
     parser.add_argument('-t','--taxon_limit',type = int, default = 6)
     parser.add_argument('-n','--names', nargs='+', help = 'space separated taxonomic ranks')
-    parser.add_argument('-o','--outfname', default = "filter.fasta", type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
-    parser.add_argument('-r','--remove', nargs='+', default = ['SAR', 'Alveolata', 'Stramenopiles', 'Diatomea', 'Excavata','Discoba','Discicristata','Euglenida'] , help = 'list of taxonomic to remove sequences', required = False)
+    parser.add_argument('-o','--outfname',    default = "filter.fasta", type=argparse.FileType('w'), help = 'list of words/taxonomic names to look for in silva taxonomic', required = True)
+    parser.add_argument('-r','--remove', nargs='+', default = ['SAR', 'Alveolata', 'Diatomea', 'Excavata','Discoba','Discicristata','Euglenida'] , help = 'list of taxonomic to remove sequences', required = False)
     parser.add_argument('-x','--reject', nargs='+', default = ["uncultured"] , help = 'list of taxonomic to reject sequences', required = False)
     args = parser.parse_args()
     if not (args.select or args.names):
