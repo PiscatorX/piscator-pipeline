@@ -39,8 +39,7 @@ class  SilvaFilter(object):
                      continue
                  n = len(clean_taxon)
                  #N=6 domain, phylum, class, order, family, and genus.
-                 if n < self.taxon_limit:
-                     print(n,  rec)
+                 if n < self.taxon_limit: 
                      continue
                  #formating the description
                  #generating the seq_id and taxonomy data for map file
@@ -48,7 +47,6 @@ class  SilvaFilter(object):
                  clean_taxon =  ';'.join(clean_taxon[:6])
                  
                  rec.description =  clean_taxon
-                 #print(rec.description, file = self.mapping_fobj, flush = True)
                  print(rec.description, file = self.mapping_fobj)
                  select_seq_data.append(rec)
         SeqIO.write(select_seq_data, self.outfname, self.outformat)
