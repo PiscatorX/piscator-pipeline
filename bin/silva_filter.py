@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from Bio import SeqIO
 import argparse
 import pprint
@@ -15,6 +16,7 @@ class  SilvaFilter(object):
         self.select    = args.select
         self.names     = args.names
         self.outfname  = args.outfname
+        self.mapping_fobj  =  open(args.outfname.name +'.map', 'w')
         self.remove    = [ taxon.lower() for taxon in args.remove ]
         self.outformat = args.outformat
         self.taxon_limit = args.taxon_limit
@@ -29,7 +31,7 @@ class  SilvaFilter(object):
     def  parse_data(self):
 
         select_seq_data =  []
-        for rec in self.seq_data:
+        for rec in self.seq_data: 
              taxon_data = rec.description.split(';')
              clean_taxon = [ taxon for taxon in taxon_data if taxon.lower() not in self.remove ]
              if self.is_select(clean_taxon):
@@ -38,13 +40,20 @@ class  SilvaFilter(object):
                  n = len(clean_taxon)
                  #N=6 domain, phylum, class, order, family, and genus.
                  if n < self.taxon_limit:
-                     
+                     print(n,  rec)
                      continue
-                 rec.description = ';'.join(clean_taxon[:6])
+                 #formating the description
+                 #generating the seq_id and taxonomy data for map file
+                 clean_taxon[0] =  '\t'.join(clean_taxon[0].split())
+                 clean_taxon =  ';'.join(clean_taxon[:6])
+                 
+                 rec.description =  clean_taxon
+                 #print(rec.description, file = self.mapping_fobj, flush = True)
+                 print(rec.description, file = self.mapping_fobj)
                  select_seq_data.append(rec)
         SeqIO.write(select_seq_data, self.outfname, self.outformat)
         self.outfname.close()
-
+        self.mapping_fobj.close()
                  
     def is_select(self, taxa_data):
 
