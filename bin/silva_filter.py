@@ -43,11 +43,10 @@ class  SilvaFilter(object):
                      continue
                  #formating the description
                  #generating the seq_id and taxonomy data for map file
-                 clean_taxon[0] =  '\t'.join(clean_taxon[0].split())
-                 clean_taxon =  ';'.join(clean_taxon[:6])
-                 
+    
+                 clean_taxon =  ';'.join(clean_taxon[:6])             
                  rec.description =  clean_taxon
-                 print(rec.description, file = self.mapping_fobj)
+                 print('\t'.join(clean_taxon[0].split()), file = self.mapping_fobj)
                  select_seq_data.append(rec)
         SeqIO.write(select_seq_data, self.outfname, self.outformat)
         self.outfname.close()
