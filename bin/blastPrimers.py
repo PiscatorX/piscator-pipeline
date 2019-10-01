@@ -1,10 +1,14 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from Bio.Blast.Applications import NcbiblastnCommandline
 from Bio.Blast import NCBIXML
 import argparse
 import pprint
-from primer_map import PrimerDB
+import pandas as pd
+#from primer_map import PrimerDB
 import os
+
+
+
 
 class PrimerBlastn(object):
 
@@ -23,12 +27,10 @@ class PrimerBlastn(object):
         parser.add_argument('-w','--word_size', dest='word_size', action='store',default=5, required=False, type=int)
         parser.add_argument('-a','--add',dest='add',nargs='*',  
                             help="Additional unvalidated blastn args in the form keyword=value e.g \"evalue=0.001\"")
-        parser.add_argument('-d','--db-name', dest='db_name', action='store', required=True,  type=str,
-                            help = "Database where primer data will saved.")        
 
+        
         self.parser_args = parser.parse_args()
         self.args = vars(self.parser_args)
-        self.db_name = self.args['db_name']
         self.primer_name = os.path.basename(self.args['query']).split('.')[0]
         
 
@@ -43,7 +45,7 @@ class PrimerBlastn(object):
          if self.args['add']:
             self.args.update(dict( (var.split('=')) for var in self.args['add']))             
          del self.args['add']
-         del self.args['db_name']
+         
 
          Blast_cline = NcbiblastnCommandline(**self.args) 
          #print Blast_cline
@@ -58,13 +60,13 @@ class PrimerBlastn(object):
             for alignment in results.alignments:
                 for rec in alignment.hsps:
                      self.primer_data = vars(rec)
-                     self.primer_data['primer_ID'] = self.primer_name
+                     primer_df = pd.DataFrame.from_dict(self.primer_data)
+                     primer_df.to_csv('.'.join([self.primer_name, 'csv'])
                      return 
-                     
+
+                                      
+                 
 if  __name__  ==  '__main__':
     primer_blast = PrimerBlastn()
-    primer_map = PrimerDB(primer_blast.args['db_name'])
     primer_blast.Blast_it()
     primer_blast.parse_xml()
-    pprint.pprint(primer_blast.primer_data)
-    primer_map.DB_Insert(primer_blast.primer_data)
