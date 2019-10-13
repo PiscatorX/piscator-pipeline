@@ -2,6 +2,7 @@
 
 from mysql.connector import errorcode
 import mysql.connector
+import collections
 import argparse
 import pprint
 import sys
@@ -24,9 +25,7 @@ class PrimerDB(object):
              'password' :'Pythonic',
               'database':'piscator'}
 
-       # 'host': "localhost",
-  
-        #config file stores all the database
+        #'host': "localhost", 
         parser = argparse.ArgumentParser(description="""Compile High-Throughput Sequencing 
         (HTS) Primer database using a csv primer file.""",
         epilog='NOTE: This utility expects database to be created and cvs files to have headers')
@@ -61,7 +60,7 @@ class PrimerDB(object):
             
     def init_tables(self):
 
-        TABLES = {}
+        TABLES = collections.OrderedDict()
         
         TABLES['primers'] = (
              " CREATE TABLE `primers` ("
@@ -102,12 +101,23 @@ class PrimerDB(object):
              " `len`	   INT NOT NULL,"
              " `seq_id`    VARCHAR(1000) NOT NULL"
              " ) ENGINE=InnoDB")
-
-        
+  
         TABLES['taxa_data'] = (
              " CREATE TABLE `taxa_data` ("
              " `seq_id` CHAR(30)  PRIMARY KEY NOT NULL,"
-             " `taxonomy` LONGTEXT NOT NULL"
+             "`domain`  CHAR(30) NOT NULL,"
+             "`phylum`  CHAR(30) NOT NULL,"
+             "`class_`  CHAR(30) NOT NULL,"
+             "`order_`  CHAR(30) NOT NULL,"
+             "`family`  CHAR(30) NOT NULL,"
+             "`genus`   CHAR(30) NOT NULL"
+             " ) ENGINE=InnoDB")
+
+        TABLES['taxa_assignment'] = (
+             " CREATE TABLE `taxa_assignment`("
+             "`amplicon_id` CHAR(30),"
+             "`accuracy` FLOAT NOT NULL,"
+             "FOREIGN KEY (amplicon_id) REFERENCES taxa_data(seq_id)"
              " ) ENGINE=InnoDB")
 
         self.TABLES = TABLES
