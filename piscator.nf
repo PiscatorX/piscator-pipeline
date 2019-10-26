@@ -4,18 +4,19 @@ python_virtualenv       = workflow.projectDir+"/python_virtualenv"
 //virtualenv env path for python modules
 //this allows for new versions of python plotting modules
 params.output		= "$PWD/piscator.Out"
-params.primers_csv 	= "primers.csv2"
+params.primers_csv 	= "primers.csv4"
 params.blast_RefSeq 	= "$PWD/M32703.fasta"
-params.ref_fasta 	= "$PWD/TestX.fasta"
-params.taxonomy_mapping	= "$PWD/TestX.fasta.map"
-cd_hit_clusters 	= Channel.from(0.97)
+params.ref_fasta 	= "$PWD/SILVA.fasta"
+params.taxonomy_mapping	= "$PWD/SILVA.taxonomy"
+cd_hit_clusters 	= Channel.from(0.80, 0.97, 1.0)
 ref_fasta               = Channel.value(params.ref_fasta)
 taxonomy_mapping        = Channel.value(params.taxonomy_mapping)
 ref_fasta_path          = file(params.ref_fasta)
 output                  = params.output
 primers_csv             = Channel.fromPath(params.primers_csv)
 hostname                = 'localhost'
-params.taxa_depth	= 7
+params.taxa_depth	= 6
+
 //flags for debugging
 params.analyze_primers  = true
 params.analyse_amplicons= true
@@ -54,6 +55,8 @@ params.clustalo_threads        		= ${params.clustalo_threads}
 """
 
 
+
+
 process Init_PrimerDB{
   
     echo true
@@ -61,7 +64,8 @@ process Init_PrimerDB{
     maxRetries 3
     input:
 	val hostname
-        file primers_csv
+	file primers_csv
+	val taxonomy_mapping
 	
     output:
 	val 'success' into compiled_DB  
@@ -70,18 +74,20 @@ process Init_PrimerDB{
 	hostname = ( params.dockerIP != 'None' ) ? params.dockerIP : 'localhost'   
 
 """
-    #test.py 
     
     init_primerDB.py \
     ${hostname}
 
     load_primerDB.py \
     ${hostname} \
-    -p ${primers_csv}
+    -p ${primers_csv} \
+    -t ${taxonomy_mapping}
     
 """ 
  
 }
+
+
 
 
 process get_tsv{
@@ -108,11 +114,14 @@ process get_tsv{
 }
 
 
+
+
 Fwd_Rev_pair.splitCsv()
 	    .flatten()
 	    .collate(2)
 	    .into{primers_pair1;
 	          primers_pair2}
+
 
 
 
@@ -135,12 +144,13 @@ process analyze_primers{
 """
 
     analyze_primers.py \
-    -f  $ref_fasta \
-    -P $primer
+        -f  $ref_fasta \
+        -P $primer
 
 """
 
 }
+
 
 
 
@@ -154,8 +164,8 @@ process get_amplicons_and_reads{
         val  ref_fasta	
 
    output:
-        file '*.fasta'  into reads_and_amplicons
-        file '*amplicons.fasta'  into amplicons
+        file '*reads.fasta'  into reads
+        file '*amplicons.fasta'  into amplicons1, amplicons2 
         set fwd_hit, rev_hit into primer_hits
 	
     when:
@@ -171,15 +181,17 @@ process get_amplicons_and_reads{
 """
 
     get_amplicons_and_reads.py \
-    -i $fwd_hit:$rev_hit \
-    -R 300 \
-    -f $ref_fasta \
-    -d p \
-    -v
+	-i $fwd_hit:$rev_hit \
+	-R 300 \
+	-f $ref_fasta \
+	-d p \
+	-v
 
 """
 
 }
+
+
 
 
 process analyse_amplicons{
@@ -188,7 +200,7 @@ process analyse_amplicons{
     publishDir path: "${output}/amplicon_plots", mode: 'copy'
 
     input:
-        file amplicons from amplicons
+        file amplicons from amplicons1
 
     output:
         file '*.ps' into amplicon_histograms
@@ -199,17 +211,19 @@ process analyse_amplicons{
 """
 
    amplicons_histograms.py \
-   -f $amplicons
+       -f $amplicons
 
 """
 
 }
 
 
+
+
 process taxa_coverage{
  
-    publishDir path: "${output}/taxonomy_coverage", mode: 'move'
     
+    publishDir path: "${output}/taxonomy_coverage", mode: 'copy'
     input:
         set fwd_hit, rev_hit from primer_hits
         file hits from primer_results2.collect()	
@@ -228,61 +242,70 @@ process taxa_coverage{
 """
 
    taxa_coverage.py \
-   -i ${fwd_hit}:${rev_hit} \
-   --taxa_fp ${taxonomy_mapping} \
-   -d ${taxa_depth} \
-   -o ${pair_id} \
-   -p 
+       -i ${fwd_hit}:${rev_hit} \
+       --taxa_fp ${taxonomy_mapping} \
+       -d ${taxa_depth} \
+       -o ${pair_id} \
+       -p 
 
 """    
 
 }
 
 
+
+
 process compile_taxa_coverage{
 
-    //echo true
+    //collects taxonomy coverage files into levels for comparison
+    //will fail for some taxonomy levels
+    errorStrategy 'ignore'
+    publishDir path: "${output}/coverage_levels", mode: 'copy'
     input:
-        val files from taxa_coverage_plots.collect()
+        file files from taxa_coverage_plots.collect()
 	val taxa_depth
-	
 
+    output:
+	file "*" into coverage
+	file "taxonomy_reports/*hits_*_hits_coverage.txt" into  coverage_reports
+
+ 
 """
-depth=${taxa_depth}
 
-cd "${output}/taxonomy_coverage"
-
-for level in `seq ${taxa_depth}` ;
+for level in `seq ${taxa_depth}` 
 
 do
-    mkdir -pv level_\${level}
-    for  pdf  in  `ls  */*/*_level_\${level}.pdf`
-
-        do
-
-	    pdf=`realpath \${pdf}`
-	    ln -fs \${pdf} -t  level_\${level}
-
-        done
-    
+     mkdir -pv taxonomy_level_\${level}
+     for  pdf  in  `ls  */*primers_coverage/*_level_\${level}.pdf`
+         do
+ 	    pdf=`realpath \${pdf}`
+ 	    mv \${pdf}  taxonomy_level_\${level}
+         done
+     
 done
 
-"""
+mkdir -pv taxonomy_reports
 
+mv -nv  */*/*.txt  taxonomy_reports
+
+"""
 }
+
+
 
 
 process taxa_assignment{
 
-    echo true
-    errorStrategy 'ignore'
-    publishDir path: "${output}", mode: 'copy'
+    //errorStrategy 'ignore'
+    publishDir path: "${output}/taxa_assignment_report", mode: 'copy'
     input:
-	file seq from reads_and_amplicons.flatten()
+	file seq from amplicons2
         val taxonomy_mapping
         val  ref_fasta
     output:
-        file "taxa_accuracy_reports" into taxa_reports
+         file "*_amplicons_assignments.txt" into amplicon_assignments
+	 file "*_amplicons_accuracy_report.txt"
+
     when:
        params.analyse_amplicons == true
 
@@ -290,34 +313,79 @@ process taxa_assignment{
 """	
     
     taxa_assignment_report.py \
-    -t ${taxonomy_mapping} \
-    -f ${seq} \
-    -d 7 \
-    -T ${ref_fasta} \
-    -o  taxa_accuracy_reports
+	-t ${taxonomy_mapping} \
+	-f ${seq} \
+	-T ${ref_fasta} \
+	-d 6 \
+        -c 0.5
+    
 
 """
-	
+
+
 }
 
 
-// process Generate_fasta{
 
 
-//     input:
-//        file primer_tsv from primer_fasta.flatten()
-    
-//     output:
-// 	file primer_tsv into primers_fasta
+process load_assignment_accuracy{
 
-   
-// """
-//     generate_fasta.py \
-//     -p  ${primer_tsv}
-      
-// """
+    input:
+	file report from amplicon_assignments
+	
+    output:
+         val 'success' into accuracy_reports
 
-// }
+
+"""	
+
+     load_taxa_report.py  localhost \
+        -r ${report}
+
+"""
+
+}
+
+
+
+
+process plot_accuracy{
+
+    publishDir path: "${output}/assignment_accuracy", mode: 'copy'
+    input:
+	val accuracy from accuracy_reports.collect()
+	
+    output:
+        file  "assignment_accuracy.*"
+
+"""	
+
+     source activate_env.sh
+     plot_accuracy.py localhost
+
+
+"""
+
+}
+
+
+
+
+process load_coverage{
+
+    input:
+	file coverage from coverage_reports.flatten()
+	
+
+
+"""	
+
+  load_coverage.py localhost \
+     -r ${coverage}
+
+"""
+
+}
 
 
 
@@ -345,6 +413,7 @@ process Get_PhysProp {
 
 
 
+
 process physchem_plots{
 
     publishDir path: "${output}/physchem_plots", mode: 'copy'
@@ -369,11 +438,9 @@ process physchem_plots{
 
 
 
-
-
 process pair_tsv{
 
-    //echo true
+   
     input:
 	file "*" from pair_tsv.collect()
 	set fwd, rev from  primers_pair2
@@ -395,9 +462,10 @@ process pair_tsv{
 
 
 
+
 process emboss_primersearch{
 
-    echo true
+
     publishDir path: "${output}/primersearch", mode: 'copy'
     input:
 	file primer_pair from primersearch_tsv
@@ -414,7 +482,7 @@ process emboss_primersearch{
     primersearch \
     -seqall ${ref_fasta} \
     -infile ${primer_pair} \
-    -mismatchpercent 15 \
+    -mismatchpercent 20 \
     -outfile ${outfile} \
     -verbose 
 
@@ -444,16 +512,18 @@ process amplicon_stats{
 }
 
 
+
+
 process  plot_ampliconData{
 
     
-    publishDir path: "${output}/emboss_amplicons", mode: 'move'
+    publishDir path: "${output}/emboss_amplicons", mode: 'copy'
     input:
         val stats from amplicon_stats1.collect()
         val ref_fasta
 
     output:
-         file '*.pdf'  into Plots
+         file '*' 
         
 
 """   
@@ -466,6 +536,7 @@ process  plot_ampliconData{
 """
 
 }
+
 
 
 
@@ -486,11 +557,13 @@ process amplicon_fasta_gen{
 
     seqret_amplicons.py \
     ${hostname} \
-    -r ${ref_fasta}
+    -R ${ref_fasta}
 
 """
 
 }
+
+
 
 
 process cd_hit_est{
@@ -527,6 +600,7 @@ process cd_hit_est{
 
 
 
+
 process analyse_clusters{
   
     publishDir path: "${output}/analyse_clusters", mode: 'copy'  
@@ -534,9 +608,10 @@ process analyse_clusters{
         file fasta_cluster from cdhit_clusters.collect()
 
     output:
-       val  'CDhit_counts*' into hit_plots
- 
-   
+        file  "CDhit_counts*" into hit_plots
+
+
+
 """ 
  
     analyse_clusters.py
@@ -552,14 +627,14 @@ process analyse_clusters{
 process analyse_genetic_distances{
 
     errorStrategy 'ignore'
-    publishDir path: "${output}/genetic_distances", mode: 'move'
+    publishDir path: "${output}/genetic_distances", mode: 'copy'
     input:  
 	file seq_hits from cd_hits.collect()
     
     output:
 	file "*.pdf" into distance_plots
 
-   
+
 """    
     source activate_env.sh 
 
@@ -569,41 +644,3 @@ process analyse_genetic_distances{
 """
 
 }
-
-
-
-// // process  BlastPrimers{
-
-// // echo true  
-  
-// // input:
-// //     file primer_fasta from primers_fasta.flatten()
-
-    
-// // """
-
-// //     BlastPrimers.py -q $primer_fasta -s $params.blast_RefSeq  -d $primerDB
-
-// // """    
-
-// // }
-
-workflow.onComplete {
-
-  println """
-
-    Pipeline execution summary
-    ---------------------------
-    Completed at: ${workflow.complete}
-    Duration    : ${workflow.duration}
-    Success     : ${workflow.success}
-    workDir     : ${workflow.workDir}
-    exit status : ${workflow.exitStatus}
-    Error report: ${workflow.errorReport ?: '-'}
-    """
-}
-
-
-
-
-
