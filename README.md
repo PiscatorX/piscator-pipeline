@@ -19,8 +19,7 @@ Nextflow requires Java to to run, more details from [nexflow](https://www.nextfl
 
 1. First you must install python dependensies.  Install  pythop-pip a utility for downloading python modules
    * ``sudo apt-get install build-essential``
-   *  ```sh
-      apt update  && apt install -y \
+   *  ```apt update  && apt install -y \
       build-essential \
       clustalo \
       emboss \
@@ -34,14 +33,14 @@ Nextflow requires Java to to run, more details from [nexflow](https://www.nextfl
       unzip \
       wget ```  
       
-   * ``sudo apt-get install pip``
+   * ```sudo apt-get install pip```
 
 2. Install the dependencies using using the file dependencies file
-   * ``pip install  -r  main-requirements.txt``
+   * ```pip install  -r  main-requirements.txt```
+   
 3. Install **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
    
-  ```shell
-     wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.tar.gz && \
+  ```wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.tar.gz && \
      tar -zxvf  pprospector-1.0.1.tar.gz && \
      cd pprospector-1.0.1 && \
      pip install . ```
