@@ -17,23 +17,22 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 
 Nextflow requires Java to to run, more details from [nexflow](https://www.nextflow.io/)
 
-1. First you must install python dependensies.  Install  pythop-pip a utility for downloading python modules
+1. First you must all the programs, tools, related dependensies required by the computer pipeline.  
    * ``sudo apt-get install build-essential``
    *  ```apt update  && apt install -y \
-      build-essential \
-      clustalo \
-      emboss \
-      git \
-      libfreetype6-dev \
-      libpng-dev \
-      libx11-dev \
-      python-pip \
-      python2.7 \
-      python-tk \
-      unzip \
-      wget ```  
-      
-   * ```sudo apt-get install pip```
+	     build-essential \
+	     cd-hit \
+	     clustalo \
+	     emboss \
+	     libfreetype6-dev \
+	     libpng-dev \
+	     libx11-dev \
+	     openjdk-8-jdk \
+	     python-pip \
+	     python-tk \
+	     python2.7 \
+	     unzip \
+	     wget ```  
 
 2. Install the dependencies using using the file dependencies file
    * ```pip install  -r  main-requirements.txt```
@@ -53,9 +52,20 @@ Nextflow requires Java to to run, more details from [nexflow](https://www.nextfl
 
 5. **Python dependencies**
 
+    pip install numpy==1.7.1
+    wget https://github.com/pycogent/pycogent/archive/1.5-release.tar.gz && \
+     	 tar -zxvf   1.5-release.tar.gz && \
+     	 cd pycogent-1.5-release && \
+     	 pip install .
+
+
  * PyCogent (ver. 1.5)  http://sourceforge.net/projects/pycogent/files/PyCogent/1.5/PyCogent-1.5.tgz/download (license: GPL)
  * Numpy (ver. 1.3.0)   http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0.tar.gz/download (license: BSD)
  * Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
-
+6. A workaround to address dependency issue. This is a temporary fix, Likely to change in the future.
+   Create an internal environment ``virtualenv  python_virtualenv``
+   Activate the environment ``source python_virtualenv/bin/activate``
+   Install the dependencies  ``pip install  -r ../env-requirements.txt``
+   
 ### **Running under Docker**
  * The pipeline has implemented to run on Docker; however, this is not fully tested. The [Dockerfile](https://github.com/PiscatorX/piscator-pipeline/blob/master/docker/Dockerfile) is provided.
