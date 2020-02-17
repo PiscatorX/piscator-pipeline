@@ -18,31 +18,33 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 Nextflow requires Java to to run, more details from [nexflow](https://www.nextflow.io/)
 
 1. First you must all the programs, tools, related dependencies required by the computer pipeline.  
-   * ```sudo apt-get install build-essential```
-   *  ```sudo apt update  && apt install -y \
-	     build-essential \
-	     cd-hit \
-	     clustalo \
-	     emboss \
-	     libfreetype6-dev \
-	     libpng-dev \
-	     libx11-dev \
-	     openjdk-8-jdk \
-	     python-pip \
-	     python-tk \
-	     python2.7 \
-	     unzip \
-	     wget ```  
+   ```
+   sudo apt-get install build-essential
+   sudo apt update  && apt install -y \
+    	     build-essential 
+   	     cd-hit \
+   	     clustalo \
+   	     emboss \
+   	     libfreetype6-dev \
+   	     libpng-dev \
+   	     libx11-dev \
+   	     openjdk-8-jdk \
+   	     python-pip \
+   	     python-tk \
+             python2.7
+   ```
 
 2. Install the dependencies using using the file dependencies file
-   * ```pip install  -r  main-requirements.txt```
+   `pip install  -r  main-requirements.txt`
    
 3. Install **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
    
-  ```wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.tar.gz && \
+   ```
+     wget https://sourceforge.net/projects/pprospector/files/pprospector-1.0.1.tar.gz && \
      tar -zxvf  pprospector-1.0.1.tar.gz && \
      cd pprospector-1.0.1 && \
-     pip install . ```
+     pip install .
+   ```
  
 4.  Install **[RDP classifier](https://sourceforge.net/projects/rdp-classifier/)**
 
@@ -51,22 +53,24 @@ Nextflow requires Java to to run, more details from [nexflow](https://www.nextfl
  * ``source /home/pprospector/.bashrc``
 
 5. **Python dependencies**
-    wget https://github.com/pycogent/pycogent/archive/1.5-release.tar.gz && \
-     	 tar -zxvf   1.5-release.tar.gz && \
-     	 cd pycogent-1.5-release && \
-     	 pip install .
+   ```
+   wget https://github.com/pycogent/pycogent/archive/1.5-release.tar.gz && \
+       tar -zxvf   1.5-release.tar.gz && \
+       cd pycogent-1.5-release && \
+       pip install .
+   ```
 
-6. A workaround to address dependency issue. This is a temporary fix, Likely to change in the future.
-   Create an internal environment ```virtualenv  python_virtualenv```
-   Activate the environment ```source python_virtualenv/bin/activate```
-   Install the dependencies ```pip install  -r ../env-requirements.txt```
-   Deactivate the environment ```deactivate``
+6. A workaround to address dependency issues. This is a temporary fix, Likely to change in the future.
+   Create an internal environment `virtualenv  python_virtualenv`
+   Activate the environment `source python_virtualenv/bin/activate`
+   Install the dependencies `pip install  -r ../env-requirements.txt`
+   Deactivate the environment `deactivate`
 
 
-### **Running Piscator
- * The main nextflow script file is ```piscator.nf``` and can be run using providing a tsv file containing the primers and changing the corresponding section in the main script.
- * The script may be run by invoking the command ```nextflow  piscator.nf```
- * Alternatively the script may be called from anywhere by making it executable and adding the directory to the PATH variable.
+### **Running Piscator**
+ * The main nextflow script file is `piscator.nf` and can be run using providing a tsv file containing the primers and changing the corresponding section in the main script.
+ * The script may be run by invoking the command `nextflow  piscator.nf`
+ * Alternatively the script may be called from anywhere by making it executable and adding the directory to the PATH environmental variable.
 
 
 ### **Running under Docker**
