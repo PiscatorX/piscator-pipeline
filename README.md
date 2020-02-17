@@ -1,6 +1,6 @@
 # Piscator 
 
-Piscator is a [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotides used in the Polymerase Chain Reaction (PCR) for amplicon sequencing of microbial comunities.
+Piscator is a [nexflow](https://www.nextflow.io/) computational pipeline for rapid evaluation primers or oligonucleotides used in the Polymerase Chain Reaction (PCR) for amplicon sequencing of microbial communities.
 
 ## **Getting Started**
 
@@ -17,9 +17,9 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 
 Nextflow requires Java to to run, more details from [nexflow](https://www.nextflow.io/)
 
-1. First you must all the programs, tools, related dependensies required by the computer pipeline.  
-   * ``sudo apt-get install build-essential``
-   *  ```apt update  && apt install -y \
+1. First you must all the programs, tools, related dependencies required by the computer pipeline.  
+   * ```sudo apt-get install build-essential```
+   *  ```sudo apt update  && apt install -y \
 	     build-essential \
 	     cd-hit \
 	     clustalo \
@@ -51,21 +51,23 @@ Nextflow requires Java to to run, more details from [nexflow](https://www.nextfl
  * ``source /home/pprospector/.bashrc``
 
 5. **Python dependencies**
-
-    pip install numpy==1.7.1
     wget https://github.com/pycogent/pycogent/archive/1.5-release.tar.gz && \
      	 tar -zxvf   1.5-release.tar.gz && \
      	 cd pycogent-1.5-release && \
      	 pip install .
 
-
- * PyCogent (ver. 1.5)  http://sourceforge.net/projects/pycogent/files/PyCogent/1.5/PyCogent-1.5.tgz/download (license: GPL)
- * Numpy (ver. 1.3.0)   http://sourceforge.net/projects/numpy/files/NumPy/1.3.0/numpy-1.3.0.tar.gz/download (license: BSD)
- * Matplotlib (ver. 0.98.5.3)  http://iweb.dl.sourceforge.net/project/matplotlib/OldFiles/matplotlib-0.98.5.3.tar.gz (license: BSD)
 6. A workaround to address dependency issue. This is a temporary fix, Likely to change in the future.
-   Create an internal environment ``virtualenv  python_virtualenv``
-   Activate the environment ``source python_virtualenv/bin/activate``
-   Install the dependencies  ``pip install  -r ../env-requirements.txt``
-   
+   Create an internal environment ```virtualenv  python_virtualenv```
+   Activate the environment ```source python_virtualenv/bin/activate```
+   Install the dependencies ```pip install  -r ../env-requirements.txt```
+   Deactivate the environment ```deactivate``
+
+
+### **Running Piscator
+ * The main nextflow script file is ```piscator.nf``` and can be run using providing a tsv file containing the primers and changing the corresponding section in the main script.
+ * The script may be run by invoking the command ```nextflow  piscator.nf```
+ * Alternatively the script may be called from anywhere by making it executable and adding the directory to the PATH variable.
+
+
 ### **Running under Docker**
  * The pipeline has implemented to run on Docker; however, this is not fully tested. The [Dockerfile](https://github.com/PiscatorX/piscator-pipeline/blob/master/docker/Dockerfile) is provided.
