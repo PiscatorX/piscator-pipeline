@@ -69,10 +69,9 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 
 
 ### **Running Piscator**
- *The main nextflow script file is `piscator.nf` and can be run using providing a tsv file containing the primers and changing the corresponding section in the main script.
- *The script may be run by invoking the command `nextflow  piscator.nf`
- *Alternatively the script may be called from anywhere by making it executable and adding the directory to the PATH environmental variable.
-
+   * The main nextflow script file is `piscator.nf` and can be run using providing a tsv file containing the primers and changing the corresponding variable in the main script.
+   * The script may be run by invoking the command `nextflow  piscator.nf`
+   * Alternatively the script may be called from anywhere by making it executable and adding the directory to the PATH environmental variable.
 
 ### **Running under Docker**
- * The pipeline has implemented to run on Docker; however, this is not fully tested. The [Dockerfile](https://github.com/PiscatorX/piscator-pipeline/blob/master/docker/Dockerfile) is provided.
+   * The pipeline has implemented to run on Docker; however, this is not fully tested. The [Dockerfile](https://github.com/PiscatorX/piscator-pipeline/blob/master/docker/Dockerfile) is provided.
