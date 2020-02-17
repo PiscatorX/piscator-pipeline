@@ -65,7 +65,7 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
    * Install the dependencies `pip install  -r ../env-requirements.txt`
    * Deactivate the environment `deactivate`
 
-1. [MySQL](https://dev.mysql.com/downloads/mysql/) will need to installed and the hostname supplied to the `piscator.nf` and the password and username set in the `init_primerDB.py` script in the `bin` directory.
+1. [MySQL](https://dev.mysql.com/downloads/mysql/) will need to installed and the hostname supplied to the `piscator.nf` and the password and username set in the `bin/init_primerDB.py` script
 
 
 ### **Running Piscator**
