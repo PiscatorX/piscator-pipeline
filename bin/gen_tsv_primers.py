@@ -38,7 +38,6 @@ class generateTSV(PrimerDB):
     def generateTSV(self):
         
         ext = '.tsv'  
-        fix_id = lambda primer_id, Dir: primer_id if primer_id.endswith(Dir) else primer_id+Dir
         save   = lambda primer_id, primer: open(os.path.join(self.output_dir, primer_id) + ext,'w').write(primer)
         out = lambda primer_id:  primer_id + ext
         
@@ -47,7 +46,7 @@ class generateTSV(PrimerDB):
         
         for fwd_id, fwd, rev_id, rev in self.primer_pairs:
             fwd_id, rev_id  = map(lambda x:\
-                              x.replace('_','.'),  (fix_id(fwd_id.lower(),'f'), fix_id(rev_id.lower(),'r')))
+                              x.replace('_','.'),  (self.fix_id(fwd_id, 'f'), self.fix_id(rev_id, 'r')))
             fwd =  '\t'.join([fwd_id,fwd])
             rev =   '\t'.join([rev_id,rev])
             for primer_id, direct in [(fwd_id, fwd), (rev_id, rev)]:
@@ -56,6 +55,15 @@ class generateTSV(PrimerDB):
             #pair_data.append([fwd_id, rev_id])
             output.append(','.join(to_nextflow)+'\n')
         sys.stdout.writelines(output)
+
+        
+    def fix_id(self, pid, Dir):
+        
+        if pid[-1]  == Dir:
+            return pid
+        
+        return ''.join([pid[:-1],pid[-1].lower()]) if pid[-1].lower() == Dir  else pid + Dir
+                    
     
 
 if __name__ == '__main__':

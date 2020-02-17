@@ -6,6 +6,7 @@ if not os.environ.get('DISPLAY',''):
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import itertools as it
+import pprint
 import operator as o
 import numpy as np
 import argparse
@@ -43,7 +44,8 @@ class ClusterAnalysis(object):
                                  clstr_len])
         if not self.cluster_data:
             raise Exception, "No cd_hit '*.cd_hits.clstr' files found"
-        
+
+
         dpoints = np.array(self.cluster_data)
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -54,20 +56,20 @@ class ClusterAnalysis(object):
         categories = [(c, np.mean(dpoints[dpoints[:,1] == c][:,2].astype(float)))
                                                 for c in np.unique(dpoints[:,1])]
         conditions = [c[0] for c in sorted(conditions, key=o.itemgetter(1))]
-        #pprint.pprint(conditions)
+        pprint.pprint(conditions)
         categories = [c[0] for c in sorted(categories, key=o.itemgetter(1))]
-        #pprint.pprint(categories)
+        pprint.pprint(categories)
         dpoints = np.array(sorted(dpoints, key=lambda x: categories.index(x[1])))
-        
+        print(dpoints)
+        np.savetxt("CDhit_counts.tsv", dpoints, fmt ="%s %s %s")
         n = len(conditions)
 
         width = (1 - space)/(len(conditions))
-        patterns = it.cycle(["+", "x" ".", "*" , "/" , "\\" , "|" , "-"  , "o", "O"])
         for i,cond in enumerate(conditions):
             indices = range(1, len(categories)+1)        
             vals = dpoints[dpoints[:,0] == cond][:,2].astype(np.float)
             pos = [j - (1 - space) / 2. + i * width for j in range(1,len(categories)+1) ]    
-            ax.bar(pos, vals, width=width, label=cond, color=cm.Accent(float(i) / n - i/n), hatch=patterns.next())
+            ax.bar(pos, vals, width=width, label=cond, color=cm.Accent(float(i) / n - i/n))
 
         ax.set_xticks(indices)
         ax.set_xticklabels(categories)
@@ -75,7 +77,7 @@ class ClusterAnalysis(object):
         plt.rc('legend',**{'fontsize':8})
         font = { 'fontname':'sans-serif', 'weight': 'bold', 'size': 14}
         ax.set_ylabel("Number of CD-HIT clusters", fontdict=font)
-        ax.set_xlabel("Clustering percent (%)", fontdict=font)
+        ax.set_xlabel("Clustering sequence identity (%)", fontdict=font)
 
         handles, labels = ax.get_legend_handles_labels()
         ax.legend(handles[::-1], labels[::-1], loc='upper left')
@@ -85,6 +87,3 @@ class ClusterAnalysis(object):
 if __name__ ==  '__main__':        
     clusters = ClusterAnalysis()
     clusters.plot_clusters()
-    
-    
-    

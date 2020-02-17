@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
 from init_primerDB import PrimerDB
+from Bio import SeqIO
 import mysql.connector
 import pprint
 import argparse
+import sys
 import csv
 
 
@@ -16,12 +18,13 @@ class LoadDB(PrimerDB):
         epilog='NOTE: This utility expects database to be created and cvs files to have headers')
         parser.add_argument('-p','--primers-file', dest='primers_file', action='store', 
                             required=True, type=str)
+        parser.add_argument('-t','--taxonomy', help = "taxanomy file of reference sequences", type=argparse.FileType('r'),  required=True)
         parser.add_argument('-c','--custom-header', dest='headers', default=False, action='store_true', 
                             required=False, help="""use cvs headers (default=False). Used when order of column header is different from expected. Column/header are expected in the following order: "Fwd_id, Fwd_Primer, Rev_id, Rev_Primer, Target, gene, Amplicon_length, technology, Reference, Cross_ref, notes". Important! header reading is case sensitive, if provided headers must match the case those provided here""")
 
         self.args, unknown = parser.parse_known_args()
         self.cnx.database = self.DB_NAME  
-        self.headers = self.args.headers     
+        self.headers = self.args.headers
         self.csv_reader = csv.reader(open(self.args.primers_file))
         self.table_cols = ["Fwd_id","Fwd_Primer","Rev_id","Rev_Primer",
                           "gene","Amplicon_length","technology",
@@ -49,20 +52,21 @@ class LoadDB(PrimerDB):
                 if  insert_dict:
                     row_dict = insert_dict
                     insert_dict = {}
-            self.DB_Insert(row_dict)
+            self.DB_Insert(row_dict, 'primers')
         self.cnx.commit()
         
-    def DB_Insert(self, row_dict):
+    def DB_Insert(self, row_dict, table):
         
-        cols = ','.join(row_dict.keys()) 
+        cols = ','.join(row_dict.keys())
+        #ugly hack to remove stray apostophes
         values = ','.join( '"'+val.translate(None,""""'""")+'"'  for val in  row_dict.values())
-        sql = """INSERT IGNORE   INTO primers ({}) VALUES ({})""".format(cols, values)
+        sql = """INSERT IGNORE   INTO {} ({}) VALUES ({})""".format(table, cols, values)
         
         try:
             self.cursor.execute(sql)
         except mysql.connector.errors.IntegrityError as err:
             print(err)
-            pass
+            
 
     def count_primers(self):
         sql = """SELECT count(Fwd_id), count(Rev_id) from primers"""
@@ -72,8 +76,22 @@ class LoadDB(PrimerDB):
         assert  fwd_count == rev_count, "Number of fwd primers and rev primers are not the same in the database"
         print("\n{} primer records loaded on \"{}\"  database.\n".format(fwd_count, self.DB_NAME))
 
+    def LoadTaxonomy(self):
+
+        get_ranks = lambda taxonomy: taxonomy.split(";")
+        taxonomy_csv = csv.reader(self.args.taxonomy,  delimiter = "\t")
+        cols = ["seq_id", "domain", "phylum",  "class", "order_", "family",  "genus"]
+        for i,row in enumerate(taxonomy_csv, 1):
+            seq_id = row[0]
+            values = tuple([seq_id] + get_ranks(row[1]))
+            self.DB_Insert(dict(zip(cols,values)), 'taxa_data')
+            
+        self.cnx.commit()
+
+            
 
 if __name__ == '__main__':
     LoadDB = LoadDB()
     LoadDB.LoadCSV()
     LoadDB.count_primers()
+    LoadDB.LoadTaxonomy()

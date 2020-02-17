@@ -64,14 +64,14 @@ class PhyspropPlot(PrimerDB):
         fig.subplots_adjust(hspace=.5)
         sns.set_style('whitegrid')
         
-        ax = sns.barplot(data=df[prop].T, ax=ax, palette=sns.color_palette('pastel'), capsize=.1)
+        ax = sns.barplot(data=df[prop].T, ax=ax, palette=sns.color_palette('pastel'), errwidth = .5, capsize= .5)
         for p in ax.patches:    
             ax.annotate("%.1f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-                        ha='center', va='center', xytext=(0, 10), color='blue', size=12, textcoords='offset points')
+                        ha='center', va='center', xytext=(0, 10), color='blue', size=10, textcoords='offset points')
             
-        plt.xticks(fontsize=16, rotation=45, ha="right")
-        plt.xlabel('Primer ID', fontsize=18, fontweight='bold')
-        plt.ylabel(prop, fontsize=18, fontweight='bold')
+        plt.xticks(fontsize=14, rotation=45, ha="right")
+        plt.xlabel('Primer ID', fontsize=16, fontname = 'sans-serif',  fontweight='bold')
+        plt.ylabel(prop, fontsize=16, fontname = 'sans-serif', fontweight='bold')
         
         plt.tight_layout()
         figure = ax.get_figure()

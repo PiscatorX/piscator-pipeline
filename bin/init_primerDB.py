@@ -9,9 +9,6 @@ import sys
 
 
 
-
-
-
 class PrimerDB(object):
 
     def __init__(self):
@@ -94,8 +91,8 @@ class PrimerDB(object):
              " CREATE TABLE `amplicons` ("
              " `primer_ID` CHAR(255) NOT NULL,"	
              " `amplimer`  CHAR(255) NOT NULL,"	
-             " `fwd`        INT NOT NULL,"	
-             " `fwd_mis`    INT NOT NULL,"	
+             " `fwd`       INT NOT NULL,"	
+             " `fwd_mis`   INT NOT NULL,"	
              " `rev`       INT NOT NULL,"	
              " `rev_mis`   INT NOT NULL,"	
              " `len`	   INT NOT NULL,"
@@ -104,10 +101,10 @@ class PrimerDB(object):
   
         TABLES['taxa_data'] = (
              " CREATE TABLE `taxa_data` ("
-             " `seq_id` CHAR(30)  PRIMARY KEY NOT NULL,"
+             "`seq_id`  CHAR(30) PRIMARY KEY NOT NULL,"
              "`domain`  CHAR(30) NOT NULL,"
              "`phylum`  CHAR(30) NOT NULL,"
-             "`class_`  CHAR(30) NOT NULL,"
+             "`class`   CHAR(30) NOT NULL,"
              "`order_`  CHAR(30) NOT NULL,"
              "`family`  CHAR(30) NOT NULL,"
              "`genus`   CHAR(30) NOT NULL"
@@ -115,10 +112,24 @@ class PrimerDB(object):
 
         TABLES['taxa_assignment'] = (
              " CREATE TABLE `taxa_assignment`("
-             "`amplicon_id` CHAR(30),"
-             "`accuracy` FLOAT NOT NULL,"
-             "FOREIGN KEY (amplicon_id) REFERENCES taxa_data(seq_id)"
-             " ) ENGINE=InnoDB")
+             "`primer_pair` CHAR(30),"
+             "`amplicon_id`  CHAR(30),"
+             "`accuracy`     FLOAT NOT NULL,"
+             " FOREIGN KEY (amplicon_id) REFERENCES taxa_data(seq_id)"
+             " ON DELETE CASCADE"
+             ") ENGINE=InnoDB")
+
+        
+        TABLES['taxa_coverage'] = (
+             " CREATE TABLE `taxa_coverage`("
+             "`primer_pair` CHAR(30),"
+             "`level`         CHAR(30),"
+             "`first_level`    CHAR(30),"
+             "`current_taxonomy` LONGTEXT,"
+             "`total_seqs`       INT,"
+             "`percent_passing`  DOUBLE"
+             ") ENGINE=InnoDB")
+
 
         self.TABLES = TABLES
         self.DB_tables = list(TABLES.keys())
@@ -139,7 +150,8 @@ class PrimerDB(object):
             except mysql.connector.Error as err:
                 
                 if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-                    print('Table "{}" already exists.'.format(table))
+                    print('Table "{}" already exists, deleting table data.'.format(table))
+                    self.cursor.execute("drop table {}".format(table))
                     
                 else:
                     raise Exception(err)

@@ -14,11 +14,14 @@ class GetAmplicons(PrimerDB):
         super(GetAmplicons, self).__init__()
         
         parser = argparse.ArgumentParser(description="""Save primer data populate mysql database""")
-        parser.add_argument('-r','--reference', help="fasta reference file ")
+        parser.add_argument('-R','--reference', help="fasta reference file ", type = str, required = True)
+        parser.add_argument('-f','--fwd_mis', help="maximum mismatches on forward primer", type = int, default = 3)
+        parser.add_argument('-r','--rev_mis', help="maximum mismatches on reverse primer", type = int, default = 3)
         args, unknown = parser.parse_known_args()
         self.ref_seq = args.reference
         self.cnx.database = self.DB_NAME  
-
+        self.rev_mis = args.rev_mis
+        self.fwd_mis = args.fwd_mis
         
     def parse_ref_seq(self):
         
@@ -28,7 +31,9 @@ class GetAmplicons(PrimerDB):
     def get_amplicons(self):
         
         col_ids =[ 'primer_id','amplimer','fwd','fwd_mis','rev','rev_mis','len','seq_id']
-        self.cursor.execute('select {} from amplicons order by primer_id asc'.format(",".join(col_ids)))
+        self.cursor.execute("""SELECT {} FROM amplicons 
+                               WHERE rev_mis <= {} AND rev_mis <= {}  
+                               ORDER BY primer_id ASC""".format(",".join(col_ids),self.rev_mis, self.fwd_mis))
         amplicon_data = self.cursor.fetchall()
         
         fobj = False

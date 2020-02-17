@@ -23,15 +23,17 @@ class TaxonomyReport(PrimerDB):
         self.cnx.database = self.DB_NAME
         fieldnames = ['amplicon_id','taxonomy','accuracy'] 
         self.report_csv = csv.DictReader(self.args.report, fieldnames = fieldnames, delimiter = "\t")
-
+        self.primer_pair = self.args.report.name.replace("_amplicons_assignments.txt","")
+        
 
     def get_report(self):
+
         
          for i,row in enumerate(self.report_csv, 1):
              amplicon_id, accuracy = (row['amplicon_id'], float(row['accuracy']),)
-             sql = """INSERT IGNORE   INTO taxa_assignment (amplicon_id, accuracy) VALUES (%s, %s)"""
+             sql = """INSERT IGNORE   INTO taxa_assignment (primer_pair, amplicon_id, accuracy) VALUES (%s, %s, %s)"""
              try:
-                 self.cursor.execute(sql,(amplicon_id, accuracy))
+                 self.cursor.execute(sql,(self.primer_pair, amplicon_id, accuracy))
              except mysql.connector.errors.IntegrityError as err:
                 print(err)
          self.cnx.commit()
