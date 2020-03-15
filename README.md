@@ -33,9 +33,9 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
        python2.7
    ```
 
-1. Install Nextflow more details from [nexflow](https://www.nextflow.io/)
+1. Install Nextflow. More details from [nexflow](https://www.nextflow.io/)
 
-1. Install the dependencies using using the file dependencies file
+1. Install  dependencies u using the pip requirements file
    `pip install  -r  main-requirements.txt`
    
 1. Install **[Primerprospector](http://pprospector.sourceforge.net/install/install.html)**
@@ -47,7 +47,7 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
      pip install .
    ```
  
-1. Install [RDP classifier](https://sourceforge.net/projects/rdp-classifier/)**
+1. Install **[RDP classifier](https://sourceforge.net/projects/rdp-classifier/)**
    * RDP classifier source files ``https://downloads.sourceforge.net/project/rdp-classifier/rdp-classifier/rdp_classifier_2.12.zip``
    * Add RDB to path ``echo "export PYTHONPATH=/home/pprospector/RDP/:$PYTHONPATH" >> /home/pprospector/.bashrc``
    * ``source /home/pprospector/.bashrc``
