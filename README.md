@@ -52,13 +52,15 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
    * Add RDB to path ``echo "export PYTHONPATH=/home/pprospector/RDP/:$PYTHONPATH" >> /home/pprospector/.bashrc``
    * ``source /home/pprospector/.bashrc``
 
-1. Python dependencies
+1. Install python dependencies for primerprospector
+
    ```
    wget https://github.com/pycogent/pycogent/archive/1.5-release.tar.gz && \
        tar -zxvf   1.5-release.tar.gz && \
        cd pycogent-1.5-release && \
        pip install .
    ```
+   
 1. A workaround to address dependency issues. This is a temporary fix, Likely to change in the future.
    * Create an internal environment `virtualenv  python_virtualenv`
    * Activate the environment `source python_virtualenv/bin/activate`
