@@ -61,7 +61,7 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
        pip install .
    ```
    
-1. A workaround to address dependency issues. This is a temporary fix, Likely to change in the future.
+1. A workaround to address dependency issues. *This is a temporary fix, Likely to change in the future.*
    * Create an internal environment `virtualenv  python_virtualenv`
    * Activate the environment `source python_virtualenv/bin/activate`
    * Install the dependencies `pip install  -r ../env-requirements.txt`
