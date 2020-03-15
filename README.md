@@ -16,7 +16,7 @@ Piscator is basically several utilities from the [primerprospector](http://ppros
 ### Installation
 
 
-1. First you must all the programs, tools, related dependencies required by the computer pipeline.  
+1. First you must install programs, tools, related dependencies required by the computer pipeline.  
    ```
    sudo apt-get install build-essential
    sudo apt update  && apt install -y \
